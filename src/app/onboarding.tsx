@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { View, Text, useWindowDimensions, FlatList, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { Car, ScanLine, BellRing } from "lucide-react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -36,7 +36,7 @@ export default function OnboardingScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-row justify-end px-5 pt-2">
         <Pressable onPress={finish} className="active:opacity-60 px-3 py-2">
           <Text className="text-ink-soft">Sari peste</Text>
@@ -76,6 +76,6 @@ export default function OnboardingScreen() {
       <View className="px-5 pb-4">
         <AppButton title={index === SLIDES.length - 1 ? "Începe" : "Continuă"} onPress={next} />
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

@@ -1,12 +1,13 @@
 import { useMemo, useState } from "react";
 import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router, useLocalSearchParams } from "expo-router";
 import { ChevronDown, ChevronUp, Check, X } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { AppTextInput } from "@/components/ui/AppTextInput";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { SegmentedField } from "@/components/forms/SegmentedField";
 import { ConfidenceBadge } from "@/components/ui/ConfidenceBadge";
 import { ReceiptReviewCard } from "@/components/cards/ReceiptReviewCard";
@@ -16,6 +17,7 @@ import { fuelService } from "@/services/fuel/fuelService";
 import { costsService } from "@/services/costs/costsService";
 import { FUEL_TYPES } from "@/constants";
 import { todayISO } from "@/lib/date";
+import { parseNumberInput } from "@/lib/format";
 import type { ParsedReceipt } from "@/services/receipts/receiptParser";
 import type { FuelType } from "@/types";
 
@@ -60,10 +62,10 @@ export default function ReceiptReviewScreen() {
 
   if (!parsed) {
     return (
-      <SafeAreaView className="flex-1 bg-bg">
+      <Screen className="flex-1 bg-bg">
         <View className="px-5 pt-2"><ScreenHeader title="Bon scanat" back /></View>
         <EmptyState title="Date indisponibile" description="Nu am putut citi bonul. Încearcă din nou." actionLabel="Înapoi la scanare" onAction={() => router.replace("/receipts/scan")} />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
@@ -72,9 +74,10 @@ export default function ReceiptReviewScreen() {
 
   const save = async () => {
     if (!carValue) { Alert.alert("Selectează o mașină", "Adaugă întâi o mașină în garaj."); return; }
-    const litersN = Number(liters.replace(",", "."));
-    const pplN = Number(ppl.replace(",", "."));
-    const totalN = Number(total.replace(",", "."));
+    const litersN = parseNumberInput(liters) ?? 0;
+    const pplN = parseNumberInput(ppl) ?? 0;
+    const totalN = parseNumberInput(total) ?? 0;
+    const mileageN = parseNumberInput(mileage);
     if (!totalN) { Alert.alert("Total lipsă", "Completează valoarea totală a bonului."); return; }
 
     setSaving(true);
@@ -87,7 +90,7 @@ export default function ReceiptReviewScreen() {
         liters: litersN || 0,
         pricePerLiter: pplN || 0,
         total: totalN,
-        mileage: mileage ? Number(mileage) : undefined,
+        mileage: mileageN,
         fullTank: true,
         receiptImageUri: parsed.sourceImageUri,
       });
@@ -98,7 +101,7 @@ export default function ReceiptReviewScreen() {
           amount: totalN,
           currency: "RON",
           date: date || todayISO(),
-          mileage: mileage ? Number(mileage) : undefined,
+          mileage: mileageN,
           vendor: merchant || undefined,
           notes: "Adăugat din bon scanat",
           receiptImageUri: parsed.sourceImageUri,
@@ -122,19 +125,25 @@ export default function ReceiptReviewScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <ScreenHeader title="Bon scanat" subtitle="Vrei să adaugi acest bon în aplicație?" back />
 
-          <ReceiptReviewCard merchant={merchant} total={Number(total.replace(",", ".")) || undefined} confidenceTotal={c.total} confidenceMerchant={c.merchant} />
+          <ReceiptReviewCard merchant={merchant} total={parseNumberInput(total)} confidenceTotal={c.total} confidenceMerchant={c.merchant} />
 
           {options.length > 1 && (
             <SegmentedField label="Mașină" options={options} value={carValue ?? ""} onChange={setCarId} />
           )}
 
           <Field label="Stație" level={c.merchant} value={merchant} onChangeText={setMerchant} placeholder="ex: OMV" />
-          <Field label="Data" level={c.date} value={date} onChangeText={setDate} placeholder="2026-06-01" />
+          <View className="gap-2">
+            <View className="flex-row items-center justify-between">
+              <Text className="text-ink-soft text-sm font-medium">Data</Text>
+              <ConfidenceBadge level={c.date} />
+            </View>
+            <DatePickerField value={date} onChange={setDate} />
+          </View>
 
           <View className="gap-2">
             <Text className="text-ink-soft text-sm font-medium">Tip combustibil</Text>
@@ -173,6 +182,6 @@ export default function ReceiptReviewScreen() {
           </Text>
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }

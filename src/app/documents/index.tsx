@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { View, Text, FlatList, Image, Pressable, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router, useFocusEffect } from "expo-router";
 import { FileText, Plus } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -35,7 +35,7 @@ export default function DocumentsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Documente" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
           right={<AppButton title="Adaugă" onPress={() => router.push("/documents/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
@@ -70,6 +70,6 @@ export default function DocumentsScreen() {
         )}
         {docs.length > 0 && <Text className="text-ink-faint text-xs text-center mb-2">Apasă lung pe un document pentru a-l șterge.</Text>}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

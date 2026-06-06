@@ -14,6 +14,7 @@ export type ParsedReceipt = {
   liters?: number;
   pricePerLiter?: number;
   receiptNumber?: string;
+  sourceImageUri?: string;
   rawText: string;
   confidence: {
     merchant: "high" | "medium" | "low";

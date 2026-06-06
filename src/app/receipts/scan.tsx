@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { Camera, ImageIcon, ScanLine, FlaskConical } from "lucide-react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
@@ -47,7 +47,7 @@ export default function ScanReceiptScreen() {
 
   if (busy) {
     return (
-      <SafeAreaView className="flex-1 bg-bg items-center justify-center px-10">
+      <Screen className="flex-1 bg-bg items-center justify-center px-10">
         <Animated.View entering={FadeIn} className="items-center gap-5">
           <View className="w-24 h-24 rounded-3xl bg-brand/15 border border-brand/30 items-center justify-center">
             <ScanLine size={40} color="#5B8DEF" />
@@ -60,12 +60,12 @@ export default function ScanReceiptScreen() {
             </Text>
           </View>
         </Animated.View>
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Scanează bon" subtitle="OCR offline pentru bonuri de carburant" back />
 
@@ -96,6 +96,6 @@ export default function ScanReceiptScreen() {
           OCR-ul rulează local (ML Kit / Apple Vision) și necesită un dev build — nu funcționează în Expo Go.
         </Text>
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

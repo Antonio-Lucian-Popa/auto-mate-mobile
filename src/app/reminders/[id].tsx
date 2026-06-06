@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router, useLocalSearchParams } from "expo-router";
 import { Bell, Calendar, Gauge, RefreshCw, Repeat, FileText, Trash2, CarFront } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -34,13 +34,13 @@ export default function ReminderDetailScreen() {
 
   if (!isLoading && !reminder) {
     return (
-      <SafeAreaView className="flex-1 bg-bg">
+      <Screen className="flex-1 bg-bg">
         <View className="px-5 pt-2"><ScreenHeader title="Reminder" back /></View>
         <EmptyState icon={<Bell size={28} color="#6B7693" />} title="Reminder negăsit" description="Probabil a fost șters." actionLabel="Înapoi" onAction={() => router.back()} />
-      </SafeAreaView>
+      </Screen>
     );
   }
-  if (!reminder) return <SafeAreaView className="flex-1 bg-bg" />;
+  if (!reminder) return <Screen className="flex-1 bg-bg" />;
 
   const car = cars.find((c) => c.id === reminder.carId);
   const typeLabel = REMINDER_TYPES.find((t) => t.value === reminder.type)?.label ?? reminder.type;
@@ -61,7 +61,7 @@ export default function ReminderDetailScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
         <ScreenHeader title={reminder.title} subtitle={typeLabel} back />
 
@@ -83,6 +83,6 @@ export default function ReminderDetailScreen() {
         <AppButton title="Reînnoiește reminderul" icon={<RefreshCw size={18} color="#fff" />} onPress={onRenew} loading={renew.isPending} className="mb-3" />
         <AppButton title="Șterge" variant="danger" icon={<Trash2 size={18} color="#F87171" />} onPress={onDelete} loading={del.isPending} />
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

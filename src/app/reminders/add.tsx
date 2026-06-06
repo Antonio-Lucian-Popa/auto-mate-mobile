@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { View, Text, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppTextInput } from "@/components/ui/AppTextInput";
 import { AppButton } from "@/components/ui/AppButton";
+import { DatePickerField } from "@/components/ui/DatePickerField";
 import { SegmentedField } from "@/components/forms/SegmentedField";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useCreateReminder } from "@/hooks/useReminders";
@@ -42,12 +43,14 @@ export default function AddReminderScreen() {
     create.mutate(
       {
         carId: carValue,
-        title: d.title.trim() || typeLabel,
-        type,
-        dueDate: d.dueDate.trim(),
-        dueMileage: d.dueMileage ? Number(d.dueMileage) : undefined,
-        repeatIntervalMonths: d.repeat ? Number(d.repeat) : undefined,
-        notes: d.notes.trim() || undefined,
+        data: {
+          title: d.title.trim() || typeLabel,
+          type,
+          dueDate: d.dueDate.trim(),
+          dueMileage: d.dueMileage ? Number(d.dueMileage) : undefined,
+          repeatIntervalMonths: d.repeat ? Number(d.repeat) : undefined,
+          notes: d.notes.trim() || undefined,
+        },
       },
       {
         onSuccess: (rem) => {
@@ -63,7 +66,7 @@ export default function AddReminderScreen() {
 
   if (!isLoading && options.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-bg">
+      <Screen className="flex-1 bg-bg">
         <View className="px-5 pt-2"><ScreenHeader title="Reminder nou" back /></View>
         <EmptyState
           icon={<CarFront size={30} color="#5B8DEF" />}
@@ -72,12 +75,12 @@ export default function AddReminderScreen() {
           actionLabel="Adaugă mașină"
           onAction={() => router.replace("/car/add")}
         />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <ScreenHeader title="Reminder nou" subtitle="RCA, ITP, rovinietă, service și altele" back />
@@ -98,7 +101,7 @@ export default function AddReminderScreen() {
           )} />
 
           <Controller control={control} name="dueDate" rules={{ required: "Obligatoriu" }} render={({ field: { value, onChange }, fieldState }) => (
-            <AppTextInput label="Data scadentă" placeholder="2026-09-01" value={value} onChangeText={onChange} error={fieldState.error?.message} autoCapitalize="none" />
+            <DatePickerField label="Data scadentă" value={value} onChange={onChange} error={fieldState.error?.message} />
           )} />
 
           <View className="flex-row gap-3">
@@ -119,12 +122,12 @@ export default function AddReminderScreen() {
           )} />
 
           <Text className="text-ink-faint text-xs px-1">
-            Formatul datei este AAAA-LL-ZZ. Vei primi o notificare cu {remindDays} zile înainte de expirare.
+            Vei primi o notificare cu {remindDays} zile înainte de expirare.
           </Text>
 
           <AppButton title="Salvează reminderul" onPress={handleSubmit(onSubmit)} loading={create.isPending} className="mt-1" />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }

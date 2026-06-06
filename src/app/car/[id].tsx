@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { View, Text, ScrollView, Alert, Pressable } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { useLocalSearchParams, router } from "expo-router";
 import { Trash2, Fuel, Wallet, FileText, BellPlus, Gauge } from "lucide-react-native";
 import { useCar, useDeleteCar } from "@/hooks/useCars";
@@ -37,9 +37,9 @@ export default function CarDetailScreen() {
 
   if (isLoading || !car) {
     return (
-      <SafeAreaView className="flex-1 bg-bg px-5 pt-2">
+      <Screen className="flex-1 bg-bg px-5 pt-2">
         <Skeleton height={120} />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
@@ -48,7 +48,7 @@ export default function CarDetailScreen() {
   const fuelLabel = FUEL_TYPES.find((f) => f.value === car.fuelType)?.label ?? car.fuelType;
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 18, paddingBottom: 40 }}>
         <ScreenHeader
           title={`${car.brand} ${car.model}`}
@@ -98,6 +98,6 @@ export default function CarDetailScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

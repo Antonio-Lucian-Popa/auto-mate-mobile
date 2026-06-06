@@ -1,29 +1,38 @@
 import "../../global.css";
 import { useEffect } from "react";
-import { Stack, useRouter, useSegments } from "expo-router";
+import { Stack, useRootNavigationState, useRouter, useSegments } from "expo-router";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { View, ActivityIndicator } from "react-native";
+import { View } from "react-native";
 import { useAuthStore } from "@/stores/authStore";
 import { useCarStore } from "@/stores/carStore";
 import { useSettingsStore } from "@/stores/settingsStore";
+import { colors } from "@/constants/theme";
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
+
+export const unstable_settings = {
+  initialRouteName: "index",
+};
 
 function useProtectedRoute() {
   const status = useAuthStore((s) => s.status);
   const onboarded = useSettingsStore((s) => s.onboarded);
   const segments = useSegments();
   const router = useRouter();
+  const navigationState = useRootNavigationState();
 
   useEffect(() => {
+    if (!navigationState?.key) return;
     if (status === "idle" || status === "loading") return;
-    const inAuthGroup = segments[0] === "(auth)";
-    const inOnboarding = segments[0] === "onboarding";
+    const firstSegment = segments[0] as string | undefined;
+    const atRoot = !firstSegment || firstSegment === "index";
+    const inAuthGroup = firstSegment === "(auth)";
+    const inOnboarding = firstSegment === "onboarding";
 
     if (status === "unauthenticated") {
       if (!onboarded && !inOnboarding) {
@@ -31,26 +40,18 @@ function useProtectedRoute() {
       } else if (onboarded && !inAuthGroup && !inOnboarding) {
         router.replace("/(auth)/login");
       }
-    } else if (status === "authenticated" && (inAuthGroup || inOnboarding)) {
+    } else if (status === "authenticated" && (atRoot || inAuthGroup || inOnboarding)) {
       router.replace("/(tabs)");
     }
-  }, [status, segments, onboarded]);
+  }, [status, segments, onboarded, navigationState?.key]);
 }
 
 function RootNavigator() {
   useProtectedRoute();
-  const status = useAuthStore((s) => s.status);
-
-  if (status === "idle" || status === "loading") {
-    return (
-      <View className="flex-1 bg-bg items-center justify-center">
-        <ActivityIndicator color="#5B8DEF" size="large" />
-      </View>
-    );
-  }
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#0B0F19" }, animation: "slide_from_right" }}>
+    <Stack initialRouteName="index" screenOptions={{ headerShown: false, contentStyle: { backgroundColor: "#0B0F19" }, animation: "slide_from_right" }}>
+      <Stack.Screen name="index" />
       <Stack.Screen name="(auth)" />
       <Stack.Screen name="(tabs)" />
       <Stack.Screen name="onboarding" />
@@ -77,10 +78,12 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
+      <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <QueryClientProvider client={queryClient}>
-          <StatusBar style="light" />
-          <RootNavigator />
+          <View style={{ flex: 1, backgroundColor: colors.bg }}>
+            <StatusBar style="light" backgroundColor={colors.bg} translucent={false} />
+            <RootNavigator />
+          </View>
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

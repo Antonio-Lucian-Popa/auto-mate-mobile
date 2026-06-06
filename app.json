@@ -23,6 +23,11 @@
     },
     "android": {
       "package": "com.raview.automate",
+      "backgroundColor": "#0B0F19",
+      "navigationBar": {
+        "backgroundColor": "#0B0F19",
+        "barStyle": "light-content"
+      },
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B0F19"

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { View, Text, SectionList, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { BellPlus, Bell } from "lucide-react-native";
 import { useReminders, useRenewReminder } from "@/hooks/useReminders";
@@ -35,7 +35,7 @@ export default function RemindersScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Reminder-e" subtitle="RCA, ITP, rovinietă, service" />
         {isLoading ? (
@@ -65,6 +65,6 @@ export default function RemindersScreen() {
         )}
       </View>
       <FloatingActionButton onPress={() => router.push("/reminders/add")} icon={<BellPlus size={26} color="#fff" />} />
-    </SafeAreaView>
+    </Screen>
   );
 }

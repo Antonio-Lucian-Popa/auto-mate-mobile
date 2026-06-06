@@ -1,5 +1,5 @@
 import { View, Text, FlatList } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { Car as CarIcon, Plus } from "lucide-react-native";
 import { useCars } from "@/hooks/useCars";
@@ -18,7 +18,7 @@ export default function GarageScreen() {
   const { selectedCarId, setSelectedCar } = useCarStore();
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Garaj" subtitle={`${cars?.length ?? 0} autovehicule`} />
         {isLoading ? (
@@ -54,6 +54,6 @@ export default function GarageScreen() {
         )}
       </View>
       <FloatingActionButton onPress={() => router.push("/car/add")} icon={<Plus size={28} color="#fff" />} />
-    </SafeAreaView>
+    </Screen>
   );
 }

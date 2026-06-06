@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { View, Text } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router, useFocusEffect } from "expo-router";
 import { SectionList } from "react-native";
 import { Wallet, Plus } from "lucide-react-native";
@@ -53,7 +53,7 @@ export default function CostsHistoryScreen() {
   const hasChart = monthlySeries.some((m) => m.value > 0);
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Costuri" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
           right={<AppButton title="Adaugă" onPress={() => router.push("/costs/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
@@ -91,6 +91,6 @@ export default function CostsHistoryScreen() {
           />
         )}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

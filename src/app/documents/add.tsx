@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, Text, ScrollView, Pressable, Image, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { Camera, ImageIcon, FileText, CarFront } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -27,10 +27,10 @@ export default function AddDocumentScreen() {
 
   if (!isLoading && options.length === 0) {
     return (
-      <SafeAreaView className="flex-1 bg-bg">
+      <Screen className="flex-1 bg-bg">
         <View className="px-5 pt-2"><ScreenHeader title="Document nou" back /></View>
         <EmptyState icon={<CarFront size={30} color="#22D3EE" />} title="Nicio mașină" description="Adaugă o mașină pentru a atașa documente." actionLabel="Adaugă mașină" onAction={() => router.replace("/car/add")} />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
@@ -47,7 +47,7 @@ export default function AddDocumentScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
         <ScreenHeader title="Document nou" subtitle="Atașează RCA, ITP, factură sau bon" back />
 
@@ -77,6 +77,6 @@ export default function AddDocumentScreen() {
 
         <AppButton title="Salvează documentul" onPress={save} loading={saving} className="mt-1" />
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

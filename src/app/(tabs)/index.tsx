@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { View, Text, ScrollView, RefreshControl } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { ScanLine, Fuel, Wallet, BellPlus, FileText, Gauge, TrendingUp, Coins } from "lucide-react-native";
 import { useCars } from "@/hooks/useCars";
@@ -55,15 +55,15 @@ export default function DashboardScreen() {
 
   if (isLoading) {
     return (
-      <SafeAreaView className="flex-1 bg-bg px-5 pt-2">
+      <Screen className="flex-1 bg-bg px-5 pt-2">
         <SkeletonList count={4} />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   if (!cars?.length) {
     return (
-      <SafeAreaView className="flex-1 bg-bg">
+      <Screen className="flex-1 bg-bg">
         <EmptyState
           icon={<Fuel size={32} color="#7FA8FF" />}
           title="Niciun autovehicul"
@@ -71,12 +71,12 @@ export default function DashboardScreen() {
           actionLabel="Adaugă mașină"
           onAction={() => router.push("/car/add")}
         />
-      </SafeAreaView>
+      </Screen>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <ScrollView
         contentContainerStyle={{ padding: 20, paddingBottom: 40, gap: 20 }}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#5B8DEF" />}
@@ -134,6 +134,6 @@ export default function DashboardScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

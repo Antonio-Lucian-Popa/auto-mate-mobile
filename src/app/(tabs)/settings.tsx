@@ -1,5 +1,5 @@
 import { View, Text, ScrollView, Switch, Pressable, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { Bell, Palette, Server, LogOut, FlaskConical, User, ChevronRight } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -34,7 +34,7 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
         <ScreenHeader title="Setări" />
 
@@ -82,6 +82,6 @@ export default function SettingsScreen() {
 
         <Text className="text-ink-faint text-xs text-center mt-2">AutoMate v1.0.0 · Made for Romania 🇷🇴</Text>
       </ScrollView>
-    </SafeAreaView>
+    </Screen>
   );
 }

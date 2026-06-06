@@ -8,8 +8,9 @@ type Props = TextInputProps & {
   icon?: React.ReactNode;
 };
 
-export function AppTextInput({ label, error, icon, className, ...rest }: Props) {
+export function AppTextInput({ label, error, icon, className, value, ...rest }: Props) {
   const [focused, setFocused] = useState(false);
+  const isNumeric = rest.keyboardType === "decimal-pad" || rest.keyboardType === "number-pad" || rest.keyboardType === "numeric";
   return (
     <View className="gap-2">
       {label && <Text className="text-ink-soft text-sm font-medium">{label}</Text>}
@@ -25,6 +26,11 @@ export function AppTextInput({ label, error, icon, className, ...rest }: Props) 
           placeholderTextColor="#6B7693"
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
+          autoCorrect={rest.autoCorrect ?? false}
+          autoComplete={rest.autoComplete ?? (isNumeric ? "off" : undefined)}
+          importantForAutofill={rest.importantForAutofill ?? (isNumeric ? "no" : undefined)}
+          textContentType={rest.textContentType ?? (isNumeric ? "none" : undefined)}
+          value={value ?? ""}
           className={cn("flex-1 text-ink text-base", className)}
           {...rest}
         />

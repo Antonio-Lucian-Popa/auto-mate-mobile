@@ -4,7 +4,7 @@ import { tokenStorage } from "@/services/storage/secureStorage";
 const BASE_URL =
   process.env.EXPO_PUBLIC_API_URL ??
   (Constants.expoConfig?.extra as any)?.apiUrl ??
-  "http://localhost:3000/api";
+  "https://novabytecode.ro/car-reminder/api";
 
 export class ApiError extends Error {
   status: number;

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { View, Text, FlatList, Alert } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router, useFocusEffect } from "expo-router";
 import { Fuel, Plus, Trash2, Gauge } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -58,7 +58,7 @@ export default function FuelHistoryScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Alimentări" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
           right={<AppButton title="Adaugă" onPress={() => router.push("/fuel/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
@@ -107,6 +107,6 @@ export default function FuelHistoryScreen() {
           />
         )}
       </View>
-    </SafeAreaView>
+    </Screen>
   );
 }

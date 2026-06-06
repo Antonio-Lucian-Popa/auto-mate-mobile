@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { View, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
 import { useForm, Controller } from "react-hook-form";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
@@ -41,7 +41,7 @@ export default function AddCarScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-bg">
+    <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
           <ScreenHeader title="Adaugă mașină" back />
@@ -73,6 +73,6 @@ export default function AddCarScreen() {
           <AppButton title="Salvează mașina" onPress={handleSubmit(onSubmit)} loading={create.isPending} className="mt-2" />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </Screen>
   );
 }
