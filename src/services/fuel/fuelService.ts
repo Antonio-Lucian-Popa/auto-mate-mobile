@@ -1,44 +1,60 @@
-/**
- * fuelService.ts — Serviciu MOCK local (AsyncStorage). Vezi BACKEND_EXTENSIONS_NEEDED.md.
- */
-import { jsonStorage, uid } from "@/services/storage/secureStorage";
+import { apiRequest } from "@/services/api/client";
 import type { FuelLog } from "@/types";
 
-const KEY = "automate.fuel";
+type BackendFuelLog = Omit<FuelLog, "receiptImageUri"> & {
+  receiptImageUrl: string | null;
+  createdAt: string;
+};
+
+type FuelAnalytics = {
+  averageConsumption: number | null;
+  averagePricePerLiter: number | null;
+  monthlyCost: number | null;
+  kmBetweenFillups: number | null;
+};
+
+function mapLog(l: BackendFuelLog): FuelLog {
+  return {
+    id: l.id,
+    carId: l.carId,
+    date: l.date.slice(0, 10),
+    station: l.station,
+    fuelType: l.fuelType,
+    liters: l.liters,
+    pricePerLiter: l.pricePerLiter,
+    total: l.total,
+    mileage: l.mileage,
+    fullTank: l.fullTank,
+    receiptImageUri: l.receiptImageUrl ?? undefined,
+  };
+}
 
 export const fuelService = {
   async list(carId?: string): Promise<FuelLog[]> {
-    const all = await jsonStorage.get<FuelLog[]>(KEY, []);
-    const filtered = carId ? all.filter((f) => f.carId === carId) : all;
-    return filtered.sort((a, b) => b.date.localeCompare(a.date));
-  },
-  async create(input: Omit<FuelLog, "id">): Promise<FuelLog> {
-    const all = await jsonStorage.get<FuelLog[]>(KEY, []);
-    const log: FuelLog = { ...input, id: uid() };
-    await jsonStorage.set(KEY, [log, ...all]);
-    return log;
-  },
-  async remove(id: string): Promise<void> {
-    const all = await jsonStorage.get<FuelLog[]>(KEY, []);
-    await jsonStorage.set(KEY, all.filter((f) => f.id !== id));
-  },
-  /** Consum mediu L/100km calculat intre alimentari full-tank consecutive */
-  async averageConsumption(carId: string): Promise<number | null> {
-    const logs = (await this.list(carId)).filter((f) => f.mileage && f.fullTank).sort((a, b) => a.date.localeCompare(b.date));
-    if (logs.length < 2) return null;
-    let liters = 0;
-    let km = 0;
-    for (let i = 1; i < logs.length; i++) {
-      const dist = (logs[i].mileage ?? 0) - (logs[i - 1].mileage ?? 0);
-      if (dist > 0) {
-        km += dist;
-        liters += logs[i].liters;
-      }
-    }
-    return km > 0 ? Math.round((liters / km) * 1000) / 10 : null;
+    const qs = carId ? `?carId=${carId}` : "";
+    const data = await apiRequest<BackendFuelLog[]>(`/fuel${qs}`);
+    return data.map(mapLog);
   },
 
-  /** Serie de consum L/100km intre alimentari consecutive full-tank (pt. grafic) */
+  async create(input: Omit<FuelLog, "id">): Promise<FuelLog> {
+    const data = await apiRequest<BackendFuelLog>("/fuel", {
+      method: "POST",
+      body: input,
+    });
+    return mapLog(data);
+  },
+
+  async remove(id: string): Promise<void> {
+    await apiRequest<void>(`/fuel/${id}`, { method: "DELETE" });
+  },
+
+  async averageConsumption(carId: string): Promise<number | null> {
+    const qs = `?carId=${carId}`;
+    const data = await apiRequest<FuelAnalytics>(`/fuel/analytics${qs}`);
+    return data.averageConsumption;
+  },
+
+  /** Serie L/100km intre alimentari consecutive full-tank (calculat din lista). */
   async consumptionSeries(carId: string): Promise<{ date: string; value: number }[]> {
     const logs = (await this.list(carId))
       .filter((f) => f.mileage && f.fullTank)

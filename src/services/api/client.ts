@@ -86,3 +86,35 @@ export async function apiRequest<T>(path: string, opts: RequestOptions = {}): Pr
 }
 
 export const API_BASE_URL = BASE_URL;
+
+export async function apiUpload<T>(path: string, formData: FormData, opts: { _retried?: boolean } = {}): Promise<T> {
+  const headers: Record<string, string> = {};
+  const token = await tokenStorage.getAccess();
+  if (token) headers.Authorization = `Bearer ${token}`;
+
+  const res = await fetch(`${BASE_URL}${path}`, {
+    method: "POST",
+    headers,
+    body: formData,
+  });
+
+  if (res.status === 401 && !opts._retried) {
+    const ok = await refreshTokens();
+    if (ok) return apiUpload<T>(path, formData, { _retried: true });
+    await tokenStorage.clear();
+    onUnauthorized?.();
+    throw new ApiError(401, "Sesiune expirată. Te rugăm să te autentifici din nou.");
+  }
+
+  if (!res.ok) {
+    let msg = "A apărut o eroare. Încearcă din nou.";
+    try {
+      const err = await res.json();
+      msg = err.message ?? msg;
+    } catch {}
+    throw new ApiError(res.status, msg);
+  }
+
+  if (res.status === 204) return undefined as T;
+  return (await res.json()) as T;
+}

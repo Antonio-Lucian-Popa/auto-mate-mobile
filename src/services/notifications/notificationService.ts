@@ -5,6 +5,7 @@
  */
 import * as Notifications from "expo-notifications";
 import { jsonStorage } from "@/services/storage/secureStorage";
+import { apiRequest } from "@/services/api/client";
 import type { Reminder } from "@/types";
 import { daysUntil } from "@/lib/date";
 
@@ -35,7 +36,11 @@ export const notificationService = {
       if (!granted) return null;
       const token = (await Notifications.getExpoPushTokenAsync()).data;
       await jsonStorage.set(TOKEN_KEY, token);
-      // TODO: POST token la backend cand endpoint-ul Expo Push e disponibil
+      // Trimite tokenul la backend (best-effort, nu blocheaza flow-ul)
+      apiRequest("/notifications/expo-token", {
+        method: "POST",
+        body: { token, platform: "android" },
+      }).catch(() => {/* ignorat intentionat */});
       return token;
     } catch {
       return null;

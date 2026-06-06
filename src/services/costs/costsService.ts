@@ -1,32 +1,50 @@
-/**
- * costsService.ts
- * Serviciu MOCK local (AsyncStorage) — backend-ul nu suporta inca /costs.
- * Vezi BACKEND_EXTENSIONS_NEEDED.md. Inlocuieste cu apiRequest cand e gata.
- */
-import { jsonStorage, uid } from "@/services/storage/secureStorage";
+import { apiRequest } from "@/services/api/client";
 import type { Cost } from "@/types";
 
-const KEY = "automate.costs";
+type BackendCost = Omit<Cost, "receiptImageUri"> & {
+  receiptImageUrl: string | null;
+  createdAt: string;
+};
+
+function mapCost(c: BackendCost): Cost {
+  return {
+    id: c.id,
+    carId: c.carId,
+    category: c.category,
+    amount: c.amount,
+    currency: c.currency,
+    date: c.date.slice(0, 10),
+    mileage: c.mileage,
+    vendor: c.vendor,
+    notes: c.notes,
+    receiptImageUri: c.receiptImageUrl ?? undefined,
+  };
+}
 
 export const costsService = {
   async list(carId?: string): Promise<Cost[]> {
-    const all = await jsonStorage.get<Cost[]>(KEY, []);
-    const filtered = carId ? all.filter((c) => c.carId === carId) : all;
-    return filtered.sort((a, b) => b.date.localeCompare(a.date));
+    const qs = carId ? `?carId=${carId}` : "";
+    const data = await apiRequest<BackendCost[]>(`/costs${qs}`);
+    return data.map(mapCost);
   },
+
   async create(input: Omit<Cost, "id">): Promise<Cost> {
-    const all = await jsonStorage.get<Cost[]>(KEY, []);
-    const cost: Cost = { ...input, id: uid() };
-    await jsonStorage.set(KEY, [cost, ...all]);
-    return cost;
+    const data = await apiRequest<BackendCost>("/costs", {
+      method: "POST",
+      body: input,
+    });
+    return mapCost(data);
   },
+
   async remove(id: string): Promise<void> {
-    const all = await jsonStorage.get<Cost[]>(KEY, []);
-    await jsonStorage.set(KEY, all.filter((c) => c.id !== id));
+    await apiRequest<void>(`/costs/${id}`, { method: "DELETE" });
   },
+
   async monthlyTotal(carId: string, month = new Date()): Promise<number> {
-    const all = await this.list(carId);
     const ym = month.toISOString().slice(0, 7);
-    return all.filter((c) => c.date.startsWith(ym)).reduce((s, c) => s + c.amount, 0);
+    const data = await apiRequest<{ total: number }>(
+      `/costs/summary?carId=${carId}&month=${ym}`
+    );
+    return data.total;
   },
 };

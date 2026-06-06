@@ -1,25 +1,41 @@
-/**
- * documentsService.ts — Serviciu MOCK local (AsyncStorage). Vezi BACKEND_EXTENSIONS_NEEDED.md.
- */
-import { jsonStorage, uid } from "@/services/storage/secureStorage";
+import { apiRequest, apiUpload } from "@/services/api/client";
 import type { CarDocument } from "@/types";
 
-const KEY = "automate.documents";
+type BackendDocument = Omit<CarDocument, "imageUri"> & {
+  imageUrl: string;
+};
+
+function mapDoc(d: BackendDocument): CarDocument {
+  return { ...d, imageUri: d.imageUrl };
+}
 
 export const documentsService = {
   async list(carId?: string): Promise<CarDocument[]> {
-    const all = await jsonStorage.get<CarDocument[]>(KEY, []);
-    const filtered = carId ? all.filter((d) => d.carId === carId) : all;
-    return filtered.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const qs = carId ? `?carId=${carId}` : "";
+    const data = await apiRequest<BackendDocument[]>(`/documents${qs}`);
+    return data.map(mapDoc);
   },
+
   async create(input: Omit<CarDocument, "id" | "createdAt">): Promise<CarDocument> {
-    const all = await jsonStorage.get<CarDocument[]>(KEY, []);
-    const doc: CarDocument = { ...input, id: uid(), createdAt: new Date().toISOString() };
-    await jsonStorage.set(KEY, [doc, ...all]);
-    return doc;
+    const formData = new FormData();
+    formData.append("carId", input.carId);
+    formData.append("type", input.type);
+    formData.append("title", input.title);
+    if (input.linkedCostId) formData.append("linkedCostId", input.linkedCostId);
+    if (input.linkedReminderId) formData.append("linkedReminderId", input.linkedReminderId);
+
+    // imageUri este un local file URI (din camera sau galerie)
+    formData.append("file", {
+      uri: input.imageUri,
+      type: "image/jpeg",
+      name: "document.jpg",
+    } as unknown as Blob);
+
+    const data = await apiUpload<BackendDocument>("/documents", formData);
+    return mapDoc(data);
   },
+
   async remove(id: string): Promise<void> {
-    const all = await jsonStorage.get<CarDocument[]>(KEY, []);
-    await jsonStorage.set(KEY, all.filter((d) => d.id !== id));
+    await apiRequest<void>(`/documents/${id}`, { method: "DELETE" });
   },
 };
