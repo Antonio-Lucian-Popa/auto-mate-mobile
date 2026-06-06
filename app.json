@@ -1,0 +1,49 @@
+{
+  "expo": {
+    "name": "AutoMate",
+    "slug": "automate-car-reminder",
+    "version": "1.0.0",
+    "scheme": "automate",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B0F19"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.raview.automate",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Avem nevoie de cameră pentru a scana bonurile fiscale.",
+        "NSPhotoLibraryUsageDescription": "Avem nevoie de acces la galerie pentru a alege poze cu bonuri."
+      }
+    },
+    "android": {
+      "package": "com.raview.automate",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#0B0F19"
+      },
+      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-dev-client",
+      [
+        "expo-camera",
+        { "cameraPermission": "Permite AutoMate să folosească camera pentru scanarea bonurilor." }
+      ],
+      [
+        "expo-image-picker",
+        { "photosPermission": "Permite AutoMate să acceseze pozele pentru a alege bonuri." }
+      ],
+      "expo-notifications"
+    ],
+    "experiments": { "typedRoutes": true },
+    "extra": { "eas": { "projectId": "00000000-0000-0000-0000-000000000000" } }
+  }
+}
