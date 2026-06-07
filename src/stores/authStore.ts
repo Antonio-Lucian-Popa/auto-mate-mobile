@@ -28,8 +28,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       set({ status: "unauthenticated" });
       return;
     }
-    // token prezent -> consideram autentificat; clientul API va face refresh la 401
-    set({ status: "authenticated" });
+    try {
+      const user = await authApi.me();
+      set({ user: user ?? null, status: "authenticated" });
+    } catch {
+      // Tokenul poate fi refresh-uit automat de client; dacă profilul nu vine, păstrăm sesiunea.
+      set({ status: "authenticated" });
+    }
   },
 
   login: async (email, password) => {

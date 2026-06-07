@@ -63,6 +63,21 @@ export default function DocumentsScreen() {
     ]);
   };
 
+  const openDocument = (doc: CarDocument) => {
+    const typeLabel = DOCUMENT_TYPES.find((t) => t.value === doc.type)?.label ?? doc.type;
+    router.push({
+      pathname: "/documents/[id]",
+      params: {
+        id: doc.id,
+        title: doc.title,
+        type: typeLabel,
+        uri: doc.imageUri,
+        mimeType: doc.mimeType ?? "",
+        createdAt: doc.createdAt,
+      },
+    });
+  };
+
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
@@ -85,12 +100,13 @@ export default function DocumentsScreen() {
             renderItem={({ item }) => {
               const typeLabel = DOCUMENT_TYPES.find((t) => t.value === item.type)?.label ?? item.type;
               return (
-                <Pressable onLongPress={() => remove(item.id)} className="flex-1 bg-bg-card border border-line rounded-2xl overflow-hidden active:opacity-80">
+                <Pressable onPress={() => openDocument(item)} onLongPress={() => remove(item.id)} className="flex-1 bg-bg-card border border-line rounded-2xl overflow-hidden active:opacity-80">
                   <DocumentPreview document={item} />
                   <View className="p-3 gap-1.5">
                     <Badge label={typeLabel} color="#22D3EE" bg="rgba(34,211,238,0.14)" />
                     <Text className="text-ink font-semibold text-sm" numberOfLines={1}>{item.title}</Text>
                     <Text className="text-ink-faint text-xs">{formatDate(item.createdAt)}</Text>
+                    <Text className="text-ink-faint text-xs">Apasă pentru deschidere</Text>
                   </View>
                 </Pressable>
               );

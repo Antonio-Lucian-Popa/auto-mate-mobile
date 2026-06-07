@@ -2,7 +2,7 @@ import { useState, useCallback } from "react";
 import { View, Text, ActivityIndicator, Alert } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
-import { Camera, ImageIcon, ScanLine, FlaskConical } from "lucide-react-native";
+import { Camera, ImageIcon, ScanLine } from "lucide-react-native";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppButton } from "@/components/ui/AppButton";
@@ -10,12 +10,9 @@ import { AppCard } from "@/components/ui/AppCard";
 import { pickFromCamera, pickFromLibrary } from "@/hooks/useImagePicker";
 import { extractTextFromReceiptImage } from "@/services/ocr/ocrService";
 import { parseReceipt } from "@/services/receipts/receiptParser";
-import { useSettingsStore } from "@/stores/settingsStore";
-import { setMockReceiptIndex } from "@/services/ocr/mockOcrService";
 
 export default function ScanReceiptScreen() {
   const [busy, setBusy] = useState(false);
-  const devMock = useSettingsStore((s) => s.devMockReceipts);
 
   const run = useCallback(async (uri: string | null) => {
     if (!uri) return;
@@ -27,19 +24,6 @@ export default function ScanReceiptScreen() {
       router.replace({ pathname: "/receipts/review", params: { data: payload } });
     } catch (e: any) {
       Alert.alert("OCR indisponibil", e?.message ?? "Nu am putut citi textul de pe bon. Încearcă o poză mai clară.");
-    } finally {
-      setBusy(false);
-    }
-  }, []);
-
-  const runDemo = useCallback(async () => {
-    setBusy(true);
-    try {
-      setMockReceiptIndex(Math.floor(Math.random() * 5));
-      const ocr = await extractTextFromReceiptImage("demo://receipt");
-      const parsed = parseReceipt(ocr.rawText);
-      const payload = encodeURIComponent(JSON.stringify({ ...parsed, sourceImageUri: undefined }));
-      router.replace({ pathname: "/receipts/review", params: { data: payload } });
     } finally {
       setBusy(false);
     }
@@ -82,18 +66,8 @@ export default function ScanReceiptScreen() {
         <AppButton title="Deschide camera" icon={<Camera size={20} color="#fff" />} onPress={async () => run(await pickFromCamera())} className="mb-3" />
         <AppButton title="Alege din galerie" variant="secondary" icon={<ImageIcon size={20} color="#F4F7FF" />} onPress={async () => run(await pickFromLibrary())} />
 
-        {(devMock || __DEV__) && (
-          <AppButton
-            title="Folosește bon demo"
-            variant="ghost"
-            icon={<FlaskConical size={18} color="#AEB8D0" />}
-            onPress={runDemo}
-            className="mt-4"
-          />
-        )}
-
         <Text className="text-ink-faint text-xs text-center mt-auto mb-2 px-4">
-          OCR-ul rulează local (ML Kit / Apple Vision) și necesită un dev build — nu funcționează în Expo Go.
+          OCR-ul rulează local pe telefon. Imaginea bonului rămâne pe dispozitivul tău.
         </Text>
       </View>
     </Screen>

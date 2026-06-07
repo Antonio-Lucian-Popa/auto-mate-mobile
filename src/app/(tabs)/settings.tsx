@@ -1,12 +1,10 @@
 import { View, Text, ScrollView, Switch, Pressable, Alert } from "react-native";
 import { Screen } from "@/components/ui/Screen";
-import { router } from "expo-router";
-import { Bell, Palette, Server, LogOut, FlaskConical, User, ChevronRight } from "lucide-react-native";
+import { Bell, Palette, LogOut, User, ChevronRight } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppCard } from "@/components/ui/AppCard";
 import { useAuthStore } from "@/stores/authStore";
 import { useSettingsStore } from "@/stores/settingsStore";
-import { API_BASE_URL } from "@/services/api/client";
 
 function Row({ icon, label, value, onPress, right }: { icon: React.ReactNode; label: string; value?: string; onPress?: () => void; right?: React.ReactNode }) {
   return (
@@ -24,7 +22,8 @@ function Row({ icon, label, value, onPress, right }: { icon: React.ReactNode; la
 export default function SettingsScreen() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-  const { theme, notificationsEnabled, devMockReceipts, update } = useSettingsStore();
+  const { theme, notificationsEnabled, update } = useSettingsStore();
+  const displayName = user?.name ?? user?.email?.split("@")[0] ?? "Cont AutoMate";
 
   const confirmLogout = () => {
     Alert.alert("Deconectare", "Sigur vrei să te deconectezi?", [
@@ -44,7 +43,7 @@ export default function SettingsScreen() {
               <User size={22} color="#fff" />
             </View>
             <View>
-              <Text className="text-ink font-bold text-lg">{user?.name ?? "Cont AutoMate"}</Text>
+              <Text className="text-ink font-bold text-lg">{displayName}</Text>
               <Text className="text-ink-soft text-sm">{user?.email ?? "—"}</Text>
             </View>
           </View>
@@ -62,17 +61,6 @@ export default function SettingsScreen() {
             const next = theme === "dark" ? "light" : theme === "light" ? "system" : "dark";
             update({ theme: next });
           }} />
-        </AppCard>
-
-        <AppCard className="py-1">
-          <Text className="text-ink-faint text-xs uppercase tracking-wide mt-2">Dezvoltare</Text>
-          <Row icon={<Server size={18} color="#34D399" />} label="URL API" value={API_BASE_URL} />
-          <Row
-            icon={<FlaskConical size={18} color="#FBBF24" />}
-            label="Folosește bon demo"
-            value="OCR mock în dezvoltare"
-            right={<Switch value={devMockReceipts} onValueChange={(v) => update({ devMockReceipts: v })} trackColor={{ true: "#FBBF24" }} />}
-          />
         </AppCard>
 
         <Pressable onPress={confirmLogout} className="flex-row items-center justify-center gap-2 py-4 rounded-2xl bg-danger/10 border border-danger/30 active:opacity-70">

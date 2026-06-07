@@ -12,7 +12,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#0B0F19"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.raview.automate",
@@ -32,7 +34,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0B0F19"
       },
-      "permissions": ["CAMERA", "READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "plugins": [
       "expo-router",
@@ -40,15 +47,29 @@
       "expo-dev-client",
       [
         "expo-camera",
-        { "cameraPermission": "Permite AutoMate să folosească camera pentru scanarea bonurilor." }
+        {
+          "cameraPermission": "Permite AutoMate să folosească camera pentru scanarea bonurilor."
+        }
       ],
       [
         "expo-image-picker",
-        { "photosPermission": "Permite AutoMate să acceseze pozele pentru a alege bonuri." }
+        {
+          "photosPermission": "Permite AutoMate să acceseze pozele pentru a alege bonuri."
+        }
       ],
       "expo-notifications"
     ],
-    "experiments": { "typedRoutes": true },
-    "extra": { "eas": { "projectId": "00000000-0000-0000-0000-000000000000" } }
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "d9b3e688-8976-4b29-b239-1617b4fa1bb0"
+      },
+      "router": {
+        "origin": false
+      }
+    },
+    "owner": "novabytecode"
   }
 }
