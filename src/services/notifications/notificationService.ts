@@ -49,11 +49,20 @@ export const notificationService = {
 
   /** Programeaza o notificare locala cu N zile inainte de scadenta reminderului */
   async scheduleReminder(reminder: Reminder, daysBefore = 7): Promise<string | null> {
-    const days = daysUntil(reminder.dueDate) - daysBefore;
-    if (days < 0) return null;
+    const granted = await this.requestPermissions();
+    if (!granted) return null;
+
+    const remainingDays = daysUntil(reminder.dueDate);
+    if (remainingDays < 0) return null;
+
+    const days = Math.max(remainingDays - daysBefore, 0);
     const trigger = new Date();
     trigger.setDate(trigger.getDate() + days);
     trigger.setHours(9, 0, 0, 0);
+    if (trigger.getTime() <= Date.now()) {
+      trigger.setTime(Date.now() + 60 * 60 * 1000);
+    }
+
     return Notifications.scheduleNotificationAsync({
       content: {
         title: `${reminder.title} expiră curând`,

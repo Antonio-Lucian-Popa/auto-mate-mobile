@@ -21,7 +21,7 @@ export function ScreenHeader({ title, subtitle, right, back }: Props) {
           {subtitle && <Text className="text-ink-soft text-sm">{subtitle}</Text>}
         </View>
       </View>
-      {right}
+      {right ? <View className="ml-3">{right}</View> : null}
     </View>
   );
 }

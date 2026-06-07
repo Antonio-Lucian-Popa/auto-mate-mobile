@@ -12,6 +12,8 @@ import { useCars } from "@/hooks/useCars";
 import { REMINDER_TYPES } from "@/constants";
 import { formatDate, expiryLabel, daysUntil } from "@/lib/date";
 import { formatMileage } from "@/lib/format";
+import { notificationService } from "@/services/notifications/notificationService";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 function Row({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
   return (
@@ -29,6 +31,8 @@ export default function ReminderDetailScreen() {
   const { data: cars = [] } = useCars();
   const renew = useRenewReminder();
   const del = useDeleteReminder();
+  const remindDays = useSettingsStore((s) => s.remindDaysBefore);
+  const notifEnabled = useSettingsStore((s) => s.notificationsEnabled);
 
   const reminder = reminders.find((r) => r.id === id);
 
@@ -50,7 +54,16 @@ export default function ReminderDetailScreen() {
   const onRenew = () => {
     Alert.alert("Reînnoiește reminder", "Marchează acest reminder ca reînnoit?", [
       { text: "Anulează", style: "cancel" },
-      { text: "Reînnoiește", onPress: () => renew.mutate(reminder.id) },
+      {
+        text: "Reînnoiește",
+        onPress: () => renew.mutate(reminder.id, {
+          onSuccess: (renewed) => {
+            if (notifEnabled) {
+              notificationService.scheduleReminder(renewed, remindDays).catch(() => {});
+            }
+          },
+        }),
+      },
     ]);
   };
   const onDelete = () => {

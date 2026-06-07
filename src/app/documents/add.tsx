@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { View, Text, ScrollView, Pressable, Image, Alert } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
-import { Camera, ImageIcon, FileText, CarFront } from "lucide-react-native";
+import { Camera, ImageIcon, FileText, CarFront, Upload } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppTextInput } from "@/components/ui/AppTextInput";
 import { AppButton } from "@/components/ui/AppButton";
@@ -11,7 +11,7 @@ import { SegmentedField } from "@/components/forms/SegmentedField";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useActiveCar } from "@/hooks/useActiveCar";
 import { documentsService } from "@/services/documents/documentsService";
-import { pickFromCamera, pickFromLibrary } from "@/hooks/useImagePicker";
+import { pickDocumentFile, pickImageFromCamera, pickImageFromLibrary, type PickedFile } from "@/hooks/useImagePicker";
 import { DOCUMENT_TYPES } from "@/constants";
 import type { DocumentType } from "@/types";
 
@@ -20,10 +20,24 @@ export default function AddDocumentScreen() {
   const [carId, setCarId] = useState<string | undefined>(active?.id);
   const [type, setType] = useState<DocumentType>("RCA");
   const [title, setTitle] = useState("");
-  const [imageUri, setImageUri] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<PickedFile | null>(null);
   const [saving, setSaving] = useState(false);
+  const selectedFileRef = useRef<PickedFile | null>(null);
 
   const carValue = carId ?? active?.id;
+
+  const updateSelectedFile = (file: PickedFile | null) => {
+    selectedFileRef.current = file;
+    setSelectedFile(file);
+  };
+
+  const pickFile = async () => {
+    try {
+      updateSelectedFile(await pickDocumentFile());
+    } catch (error) {
+      Alert.alert("PDF indisponibil", error instanceof Error ? error.message : "Rebuild/reinstalează aplicația Android pentru a activa încărcarea PDF.");
+    }
+  };
 
   if (!isLoading && options.length === 0) {
     return (
@@ -36,11 +50,19 @@ export default function AddDocumentScreen() {
 
   const save = async () => {
     if (!carValue) { Alert.alert("Selectează o mașină"); return; }
-    if (!imageUri) { Alert.alert("Adaugă o poză", "Fotografiază sau alege documentul din galerie."); return; }
+    const file = selectedFileRef.current;
+    if (!file) { Alert.alert("Adaugă documentul", "Fotografiază, alege o poză sau încarcă un PDF."); return; }
     const typeLabel = DOCUMENT_TYPES.find((t) => t.value === type)?.label ?? type;
     setSaving(true);
     try {
-      await documentsService.create({ carId: carValue, type, title: title.trim() || typeLabel, imageUri });
+      await documentsService.create({
+        carId: carValue,
+        type,
+        title: title.trim() || typeLabel,
+        imageUri: file.uri,
+        mimeType: file.mimeType,
+        fileName: file.name,
+      });
       router.replace("/documents");
     } catch { Alert.alert("Eroare", "Nu am putut salva documentul."); }
     finally { setSaving(false); }
@@ -52,24 +74,38 @@ export default function AddDocumentScreen() {
         <ScreenHeader title="Document nou" subtitle="Atașează RCA, ITP, factură sau bon" back />
 
         <Pressable
-          onPress={async () => { const uri = await pickFromCamera(); if (uri) setImageUri(uri); }}
+          onPress={pickFile}
           className="active:opacity-80"
         >
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} className="w-full h-56 rounded-2xl" resizeMode="cover" />
+          {selectedFile?.kind === "image" ? (
+            <Image source={{ uri: selectedFile.uri }} className="w-full h-56 rounded-2xl" resizeMode="cover" />
+          ) : selectedFile ? (
+            <AppCard className="items-center py-10">
+              <View className="w-16 h-16 rounded-3xl bg-bg-soft items-center justify-center mb-3"><FileText size={28} color="#22D3EE" /></View>
+              <Text className="text-ink font-semibold" numberOfLines={1}>{selectedFile.name ?? "Document PDF"}</Text>
+              <Text className="text-ink-faint text-xs mt-1">PDF pregătit pentru încărcare</Text>
+            </AppCard>
           ) : (
             <AppCard className="items-center py-10 border-dashed">
               <View className="w-16 h-16 rounded-3xl bg-bg-soft items-center justify-center mb-3"><FileText size={28} color="#22D3EE" /></View>
-              <Text className="text-ink font-semibold">Fotografiază documentul</Text>
-              <Text className="text-ink-faint text-xs mt-1">sau alege din galerie mai jos</Text>
+              <Text className="text-ink font-semibold">Atașează documentul</Text>
+              <Text className="text-ink-faint text-xs mt-1">poză sau PDF</Text>
             </AppCard>
           )}
         </Pressable>
 
         <View className="flex-row gap-3">
-          <View className="flex-1"><AppButton title="Camera" variant="secondary" icon={<Camera size={18} color="#F4F7FF" />} onPress={async () => { const uri = await pickFromCamera(); if (uri) setImageUri(uri); }} /></View>
-          <View className="flex-1"><AppButton title="Galerie" variant="secondary" icon={<ImageIcon size={18} color="#F4F7FF" />} onPress={async () => { const uri = await pickFromLibrary(); if (uri) setImageUri(uri); }} /></View>
+          <View className="flex-1"><AppButton title="Camera" variant="secondary" icon={<Camera size={18} color="#F4F7FF" />} onPress={async () => updateSelectedFile(await pickImageFromCamera())} /></View>
+          <View className="flex-1"><AppButton title="Galerie" variant="secondary" icon={<ImageIcon size={18} color="#F4F7FF" />} onPress={async () => updateSelectedFile(await pickImageFromLibrary())} /></View>
         </View>
+
+        <AppButton title="Fișier / PDF" variant="secondary" icon={<Upload size={18} color="#F4F7FF" />} onPress={pickFile} />
+
+        {selectedFile && (
+          <Text className="text-ink-faint text-xs px-1">
+            Selectat: {selectedFile.name ?? (selectedFile.kind === "pdf" ? "document.pdf" : "document.jpg")}
+          </Text>
+        )}
 
         {options.length > 1 && <SegmentedField label="Mașină" options={options} value={carValue ?? ""} onChange={setCarId} />}
         <SegmentedField label="Tip document" options={DOCUMENT_TYPES.map((t) => ({ value: t.value, label: t.label }))} value={type} onChange={(v) => setType(v as DocumentType)} />

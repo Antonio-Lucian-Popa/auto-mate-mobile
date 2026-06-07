@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { View, ScrollView, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
@@ -12,7 +12,7 @@ import { useActiveCar } from "@/hooks/useActiveCar";
 import { costsService } from "@/services/costs/costsService";
 import { COST_CATEGORIES } from "@/constants";
 import { todayISO } from "@/lib/date";
-import { parseNumberInput } from "@/lib/format";
+import { normalizeNumberInput, parseNumberInput } from "@/lib/format";
 import { CarFront } from "lucide-react-native";
 import type { CostCategory } from "@/types";
 
@@ -26,8 +26,21 @@ export default function AddCostScreen() {
   const [vendor, setVendor] = useState("");
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
+  const numberValuesRef = useRef({ amount: "", mileage: "" });
 
   const carValue = carId ?? active?.id;
+
+  const updateAmount = (value: string) => {
+    const next = normalizeNumberInput(value);
+    numberValuesRef.current.amount = next;
+    setAmount(next);
+  };
+
+  const updateMileage = (value: string) => {
+    const next = normalizeNumberInput(value, false);
+    numberValuesRef.current.mileage = next;
+    setMileage(next);
+  };
 
   if (!isLoading && options.length === 0) {
     return (
@@ -40,9 +53,13 @@ export default function AddCostScreen() {
 
   const save = async () => {
     if (!carValue) { Alert.alert("Selectează o mașină"); return; }
-    const amountN = parseNumberInput(amount) ?? 0;
-    const mileageN = parseNumberInput(mileage);
-    if (!amountN) { Alert.alert("Sumă lipsă", "Completează suma cheltuită."); return; }
+    const latest = numberValuesRef.current;
+    const amountN = parseNumberInput(latest.amount) ?? 0;
+    const mileageN = parseNumberInput(latest.mileage);
+    if (amountN <= 0) {
+      Alert.alert("Sumă lipsă", `Completează suma cheltuită.\n\nAplicația citește acum: Sumă="${latest.amount || "-"}".`);
+      return;
+    }
     setSaving(true);
     try {
       await costsService.create({
@@ -64,10 +81,10 @@ export default function AddCostScreen() {
           {options.length > 1 && <SegmentedField label="Mașină" options={options} value={carValue ?? ""} onChange={setCarId} />}
           <SegmentedField label="Categorie" options={COST_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))} value={category} onChange={(v) => setCategory(v as CostCategory)} />
 
-          <AppTextInput label="Sumă (RON)" value={amount} onChangeText={setAmount} keyboardType="decimal-pad" placeholder="450" />
+          <AppTextInput label="Sumă (RON)" value={amount} onChangeText={updateAmount} keyboardType="decimal-pad" placeholder="450" />
           <View className="flex-row gap-3">
             <View className="flex-1"><DatePickerField label="Data" value={date} onChange={setDate} /></View>
-            <View className="flex-1"><AppTextInput label="Km la bord" value={mileage} onChangeText={setMileage} keyboardType="number-pad" placeholder="184320" /></View>
+            <View className="flex-1"><AppTextInput label="Km la bord" value={mileage} onChangeText={updateMileage} keyboardType="number-pad" placeholder="184320" /></View>
           </View>
           <AppTextInput label="Furnizor (opțional)" value={vendor} onChangeText={setVendor} placeholder="ex: Service Auto Vrancea" />
           <AppTextInput label="Note (opțional)" value={notes} onChangeText={setNotes} placeholder="Detalii" multiline />

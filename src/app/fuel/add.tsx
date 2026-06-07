@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { View, Text, ScrollView, Pressable, KeyboardAvoidingView, Platform, Alert } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { router } from "expo-router";
@@ -29,17 +29,48 @@ export default function AddFuelScreen() {
   const [fullTank, setFullTank] = useState(true);
   const [saving, setSaving] = useState(false);
   const [fuelInputError, setFuelInputError] = useState<string | undefined>();
+  const numberValuesRef = useRef({ liters: "", ppl: "", total: "", mileage: "" });
 
   // total auto-calculat din litri × pret
   useEffect(() => {
     const l = parseNumberInput(liters) ?? 0;
     const p = parseNumberInput(ppl) ?? 0;
-    if (l > 0 && p > 0) setTotal((Math.round(l * p * 100) / 100).toString());
+    if (l > 0 && p > 0) {
+      const nextTotal = (Math.round(l * p * 100) / 100).toString();
+      numberValuesRef.current.total = nextTotal;
+      setTotal(nextTotal);
+    }
   }, [liters, ppl]);
 
   const carValue = carId ?? active?.id;
   const hasFuelValues = (parseNumberInput(total) ?? 0) > 0 || (parseNumberInput(liters) ?? 0) > 0;
   const visibleFuelInputError = fuelInputError && !hasFuelValues ? fuelInputError : undefined;
+
+  const updateLiters = (value: string) => {
+    const next = normalizeNumberInput(value);
+    numberValuesRef.current.liters = next;
+    setFuelInputError(undefined);
+    setLiters(next);
+  };
+
+  const updatePpl = (value: string) => {
+    const next = normalizeNumberInput(value);
+    numberValuesRef.current.ppl = next;
+    setPpl(next);
+  };
+
+  const updateTotal = (value: string) => {
+    const next = normalizeNumberInput(value);
+    numberValuesRef.current.total = next;
+    setFuelInputError(undefined);
+    setTotal(next);
+  };
+
+  const updateMileage = (value: string) => {
+    const next = normalizeNumberInput(value, false);
+    numberValuesRef.current.mileage = next;
+    setMileage(next);
+  };
 
   if (!isLoading && options.length === 0) {
     return (
@@ -52,16 +83,17 @@ export default function AddFuelScreen() {
 
   const save = async () => {
     if (!carValue) { Alert.alert("Selectează o mașină"); return; }
-    const totalN = parseNumberInput(total) ?? 0;
-    const litersN = parseNumberInput(liters) ?? 0;
-    const pplN = parseNumberInput(ppl) ?? 0;
+    const latest = numberValuesRef.current;
+    const totalN = parseNumberInput(latest.total) ?? 0;
+    const litersN = parseNumberInput(latest.liters) ?? 0;
+    const pplN = parseNumberInput(latest.ppl) ?? 0;
     const resolvedTotal = totalN > 0 ? totalN : litersN > 0 && pplN > 0 ? Math.round(litersN * pplN * 100) / 100 : 0;
-    const mileageN = parseNumberInput(mileage);
+    const mileageN = parseNumberInput(latest.mileage);
     if (resolvedTotal <= 0 && litersN <= 0) {
       setFuelInputError("Completează Litri sau Total (RON).");
       Alert.alert(
         "Date insuficiente",
-        `Completează Litri sau Total (RON).\n\nAplicația citește acum: Litri="${liters || "-"}", Total="${total || "-"}".`
+        `Completează cantitatea alimentată (Litri) sau suma plătită (Total RON). Preț/litru și Km la bord nu sunt suficiente.\n\nAplicația citește acum: Litri="${latest.liters || "-"}", Total="${latest.total || "-"}".`
       );
       return;
     }
@@ -95,16 +127,16 @@ export default function AddFuelScreen() {
           <SegmentedField label="Combustibil" options={FUEL_TYPES.filter((f) => f.value !== "hybrid")} value={fuelType} onChange={(v) => setFuelType(v as FuelType)} />
 
           <View className="flex-row gap-3">
-            <View className="flex-1"><AppTextInput label="Litri" value={liters} onChangeText={(value) => { setFuelInputError(undefined); setLiters(normalizeNumberInput(value)); }} keyboardType="decimal-pad" placeholder="42.5" error={visibleFuelInputError} /></View>
-            <View className="flex-1"><AppTextInput label="Preț / litru" value={ppl} onChangeText={(value) => setPpl(normalizeNumberInput(value))} keyboardType="decimal-pad" placeholder="7.45" /></View>
+            <View className="flex-1"><AppTextInput label="Litri" value={liters} onChangeText={updateLiters} keyboardType="decimal-pad" placeholder="42.5" error={visibleFuelInputError} /></View>
+            <View className="flex-1"><AppTextInput label="Preț / litru" value={ppl} onChangeText={updatePpl} keyboardType="decimal-pad" placeholder="7.45" /></View>
           </View>
 
-          <AppTextInput label="Total (RON)" value={total} onChangeText={(value) => { setFuelInputError(undefined); setTotal(normalizeNumberInput(value)); }} keyboardType="decimal-pad" placeholder="auto-calculat" error={visibleFuelInputError} />
+          <AppTextInput label="Total (RON)" value={total} onChangeText={updateTotal} keyboardType="decimal-pad" placeholder="auto-calculat" error={visibleFuelInputError} />
           {(parseNumberInput(total) ?? 0) > 0 && <Text className="text-ink-faint text-xs -mt-2 px-1">Total: {formatRON(parseNumberInput(total))}</Text>}
 
           <View className="flex-row gap-3">
             <View className="flex-1"><DatePickerField label="Data" value={date} onChange={setDate} /></View>
-            <View className="flex-1"><AppTextInput label="Km la bord" value={mileage} onChangeText={(value) => setMileage(normalizeNumberInput(value, false))} keyboardType="number-pad" placeholder="184320" /></View>
+            <View className="flex-1"><AppTextInput label="Km la bord" value={mileage} onChangeText={updateMileage} keyboardType="number-pad" placeholder="184320" /></View>
           </View>
 
           <Pressable onPress={() => setFullTank((v) => !v)} className="flex-row items-center gap-3 active:opacity-70">

@@ -87,6 +87,8 @@ export type CarDocument = {
   type: DocumentType;
   title: string;
   imageUri: string;
+  mimeType?: string;
+  fileName?: string;
   linkedCostId?: string;
   linkedReminderId?: string;
   createdAt: string;

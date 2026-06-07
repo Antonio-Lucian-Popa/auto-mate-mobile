@@ -4,7 +4,7 @@ import { Screen } from "@/components/ui/Screen";
 import { router, useFocusEffect } from "expo-router";
 import { FileText, Plus } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
-import { AppButton } from "@/components/ui/AppButton";
+import { HeaderIconButton } from "@/components/ui/HeaderIconButton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { Badge } from "@/components/ui/Badge";
@@ -13,6 +13,35 @@ import { documentsService } from "@/services/documents/documentsService";
 import { DOCUMENT_TYPES } from "@/constants";
 import { formatDate } from "@/lib/date";
 import type { CarDocument } from "@/types";
+
+function isPdfDocument(doc: CarDocument) {
+  const uri = doc.imageUri.toLowerCase();
+  return doc.mimeType === "application/pdf" || uri.includes(".pdf") || uri.includes("application%2Fpdf");
+}
+
+function DocumentPreview({ document }: { document: CarDocument }) {
+  const [imageFailed, setImageFailed] = useState(false);
+  const showPlaceholder = imageFailed || isPdfDocument(document);
+  const label = isPdfDocument(document) ? "PDF" : "Document";
+
+  if (showPlaceholder) {
+    return (
+      <View className="w-full h-32 bg-bg-soft items-center justify-center">
+        <FileText size={34} color="#22D3EE" />
+        <Text className="text-ink-faint text-xs mt-2">{label}</Text>
+      </View>
+    );
+  }
+
+  return (
+    <Image
+      source={{ uri: document.imageUri }}
+      className="w-full h-32 bg-bg-soft"
+      resizeMode="cover"
+      onError={() => setImageFailed(true)}
+    />
+  );
+}
 
 export default function DocumentsScreen() {
   const { active } = useActiveCar();
@@ -38,7 +67,7 @@ export default function DocumentsScreen() {
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Documente" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
-          right={<AppButton title="Adaugă" onPress={() => router.push("/documents/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
+          right={<HeaderIconButton accessibilityLabel="Adaugă document" onPress={() => router.push("/documents/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
 
         {loading ? (
           <SkeletonList count={4} />
@@ -57,7 +86,7 @@ export default function DocumentsScreen() {
               const typeLabel = DOCUMENT_TYPES.find((t) => t.value === item.type)?.label ?? item.type;
               return (
                 <Pressable onLongPress={() => remove(item.id)} className="flex-1 bg-bg-card border border-line rounded-2xl overflow-hidden active:opacity-80">
-                  <Image source={{ uri: item.imageUri }} className="w-full h-32" resizeMode="cover" />
+                  <DocumentPreview document={item} />
                   <View className="p-3 gap-1.5">
                     <Badge label={typeLabel} color="#22D3EE" bg="rgba(34,211,238,0.14)" />
                     <Text className="text-ink font-semibold text-sm" numberOfLines={1}>{item.title}</Text>

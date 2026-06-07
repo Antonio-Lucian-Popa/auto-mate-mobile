@@ -22,7 +22,7 @@ export function EmptyState({ icon, title, description, actionLabel, onAction }: 
       <Text className="text-xl font-bold text-center" style={{ color: colors.ink }}>{title}</Text>
       {description && <Text className="text-center leading-5" style={{ color: colors.inkSoft }}>{description}</Text>}
       {actionLabel && onAction && (
-        <AppButton title={actionLabel} onPress={onAction} className="mt-4 w-full" />
+        <AppButton title={actionLabel} onPress={onAction} className="mt-4 h-12 px-6 min-w-60" />
       )}
     </View>
   );

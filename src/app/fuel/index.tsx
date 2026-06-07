@@ -5,12 +5,13 @@ import { router, useFocusEffect } from "expo-router";
 import { Fuel, Plus, Trash2, Gauge } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppCard } from "@/components/ui/AppCard";
-import { AppButton } from "@/components/ui/AppButton";
+import { HeaderIconButton } from "@/components/ui/HeaderIconButton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FuelSummaryCard } from "@/components/cards/FuelSummaryCard";
 import { TrendLineChart } from "@/components/charts/TrendLineChart";
 import { MonthlyBarChart } from "@/components/charts/MonthlyBarChart";
 import { SkeletonList } from "@/components/ui/Skeleton";
+import { SegmentedField } from "@/components/forms/SegmentedField";
 import { useActiveCar } from "@/hooks/useActiveCar";
 import { fuelService } from "@/services/fuel/fuelService";
 import { sumByMonth, shortMonthLabel } from "@/lib/series";
@@ -19,7 +20,7 @@ import { formatDate } from "@/lib/date";
 import type { FuelLog } from "@/types";
 
 export default function FuelHistoryScreen() {
-  const { active } = useActiveCar();
+  const { active, options, setSelected } = useActiveCar();
   const [logs, setLogs] = useState<FuelLog[]>([]);
   const [avg, setAvg] = useState<number | null>(null);
   const [series, setSeries] = useState<{ date: string; value: number }[]>([]);
@@ -61,7 +62,13 @@ export default function FuelHistoryScreen() {
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Alimentări" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
-          right={<AppButton title="Adaugă" onPress={() => router.push("/fuel/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
+          right={<HeaderIconButton accessibilityLabel="Adaugă alimentare" onPress={() => router.push("/fuel/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
+
+        {options.length > 1 && active && (
+          <View className="mb-4">
+            <SegmentedField label="Alege mașina" options={options} value={active.id} onChange={setSelected} />
+          </View>
+        )}
 
         {loading ? (
           <SkeletonList count={4} />

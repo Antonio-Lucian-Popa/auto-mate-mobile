@@ -13,7 +13,7 @@ import { ReminderCard } from "@/components/cards/ReminderCard";
 import { Badge } from "@/components/ui/Badge";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { computeCarStatus, STATUS_META } from "@/lib/status";
-import { formatMileage, formatRON } from "@/lib/format";
+import { formatMileage, formatRONValue } from "@/lib/format";
 import { costsService } from "@/services/costs/costsService";
 import { FUEL_TYPES } from "@/constants";
 
@@ -72,13 +72,13 @@ export default function CarDetailScreen() {
         </AppCard>
 
         <View className="flex-row gap-3">
-          <StatCard label="Cost lună" value={formatRON(monthlyCost)} icon={<Wallet size={16} color="#5B8DEF" />} />
+          <StatCard label="Cost lună" value={formatRONValue(monthlyCost)} sub="RON" icon={<Wallet size={16} color="#5B8DEF" />} />
           <StatCard label="Reminder-e" value={`${(reminders ?? []).filter((r) => r.status !== "done").length}`} icon={<Gauge size={16} color="#A78BFA" />} accent="#A78BFA" />
         </View>
 
         <View className="flex-row justify-around">
-          <QuickAction icon={<Fuel size={22} color="#34D399" />} label="Alimentare" onPress={() => router.push("/fuel/add")} accent="#34D399" />
-          <QuickAction icon={<Wallet size={22} color="#FBBF24" />} label="Cost" onPress={() => router.push("/costs/add")} accent="#FBBF24" />
+          <QuickAction icon={<Fuel size={22} color="#34D399" />} label="Alimentări" onPress={() => router.push("/fuel")} accent="#34D399" />
+          <QuickAction icon={<Wallet size={22} color="#FBBF24" />} label="Costuri" onPress={() => router.push("/costs")} accent="#FBBF24" />
           <QuickAction icon={<BellPlus size={22} color="#A78BFA" />} label="Reminder" onPress={() => router.push("/reminders/add")} accent="#A78BFA" />
           <QuickAction icon={<FileText size={22} color="#22D3EE" />} label="Documente" onPress={() => router.push("/documents")} accent="#22D3EE" />
         </View>

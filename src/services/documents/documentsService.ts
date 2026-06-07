@@ -5,6 +5,8 @@ type BackendDocument = Omit<CarDocument, "imageUri"> & {
   imageUrl: string;
 };
 
+type DocumentCreateInput = Omit<CarDocument, "id" | "createdAt">;
+
 function mapDoc(d: BackendDocument): CarDocument {
   return { ...d, imageUri: d.imageUrl };
 }
@@ -16,7 +18,7 @@ export const documentsService = {
     return data.map(mapDoc);
   },
 
-  async create(input: Omit<CarDocument, "id" | "createdAt">): Promise<CarDocument> {
+  async create(input: DocumentCreateInput): Promise<CarDocument> {
     const formData = new FormData();
     formData.append("carId", input.carId);
     formData.append("type", input.type);
@@ -24,11 +26,13 @@ export const documentsService = {
     if (input.linkedCostId) formData.append("linkedCostId", input.linkedCostId);
     if (input.linkedReminderId) formData.append("linkedReminderId", input.linkedReminderId);
 
-    // imageUri este un local file URI (din camera sau galerie)
+    const mimeType = input.mimeType ?? "image/jpeg";
+    const defaultName = mimeType === "application/pdf" ? "document.pdf" : "document.jpg";
+
     formData.append("file", {
       uri: input.imageUri,
-      type: "image/jpeg",
-      name: "document.jpg",
+      type: mimeType,
+      name: input.fileName ?? defaultName,
     } as unknown as Blob);
 
     const data = await apiUpload<BackendDocument>("/documents", formData);

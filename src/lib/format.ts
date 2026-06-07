@@ -3,6 +3,11 @@ export function formatRON(amount: number | undefined | null): string {
   return new Intl.NumberFormat("ro-RO", { style: "currency", currency: "RON", maximumFractionDigits: 2 }).format(amount);
 }
 
+export function formatRONValue(amount: number | undefined | null): string {
+  if (amount == null) return "—";
+  return new Intl.NumberFormat("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+}
+
 export function formatNumber(n: number | undefined | null, digits = 2): string {
   if (n == null) return "—";
   return new Intl.NumberFormat("ro-RO", { maximumFractionDigits: digits }).format(n);

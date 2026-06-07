@@ -5,12 +5,13 @@ import { router, useFocusEffect } from "expo-router";
 import { SectionList } from "react-native";
 import { Wallet, Plus } from "lucide-react-native";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
-import { AppButton } from "@/components/ui/AppButton";
+import { HeaderIconButton } from "@/components/ui/HeaderIconButton";
 import { AppCard } from "@/components/ui/AppCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { CostTimelineItem } from "@/components/cards/CostTimelineItem";
 import { MonthlyBarChart } from "@/components/charts/MonthlyBarChart";
 import { SkeletonList } from "@/components/ui/Skeleton";
+import { SegmentedField } from "@/components/forms/SegmentedField";
 import { useActiveCar } from "@/hooks/useActiveCar";
 import { costsService } from "@/services/costs/costsService";
 import { sumByMonth } from "@/lib/series";
@@ -25,7 +26,7 @@ function monthLabel(ym: string) {
 }
 
 export default function CostsHistoryScreen() {
-  const { active } = useActiveCar();
+  const { active, options, setSelected } = useActiveCar();
   const [costs, setCosts] = useState<Cost[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -56,7 +57,13 @@ export default function CostsHistoryScreen() {
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
         <ScreenHeader title="Costuri" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
-          right={<AppButton title="Adaugă" onPress={() => router.push("/costs/add")} className="h-10 px-4" icon={<Plus size={16} color="#fff" />} />} />
+          right={<HeaderIconButton accessibilityLabel="Adaugă cost" onPress={() => router.push("/costs/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
+
+        {options.length > 1 && active && (
+          <View className="mb-4">
+            <SegmentedField label="Alege mașina" options={options} value={active.id} onChange={setSelected} />
+          </View>
+        )}
 
         {loading ? (
           <SkeletonList count={5} />
