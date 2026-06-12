@@ -63,7 +63,7 @@ export default function ReceiptReviewScreen() {
   if (!parsed) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Bon scanat" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Bon scanat" back inset={false} /></View>
         <EmptyState title="Date indisponibile" description="Nu am putut citi bonul. Încearcă din nou." actionLabel="Înapoi la scanare" onAction={() => router.replace("/receipts/scan")} />
       </Screen>
     );
@@ -128,7 +128,7 @@ export default function ReceiptReviewScreen() {
     <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <ScreenHeader title="Bon scanat" subtitle="Vrei să adaugi acest bon în aplicație?" back />
+          <ScreenHeader title="Bon scanat" subtitle="Vrei să adaugi acest bon în aplicație?" back inset={false} />
 
           <ReceiptReviewCard merchant={merchant} total={parseNumberInput(total)} confidenceTotal={c.total} confidenceMerchant={c.merchant} />
 

@@ -45,7 +45,7 @@ export default function DocumentPreviewScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title={title} subtitle={[type, createdAt ? formatDate(createdAt) : ""].filter(Boolean).join(" • ")} back />
+        <ScreenHeader title={title} subtitle={[type, createdAt ? formatDate(createdAt) : ""].filter(Boolean).join(" • ")} back inset={false} />
 
         <View className="flex-1 overflow-hidden rounded-2xl border border-line bg-bg-card">
           {!uri || failed ? (

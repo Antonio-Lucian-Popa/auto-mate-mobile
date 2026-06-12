@@ -61,7 +61,7 @@ export default function FuelHistoryScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title="Alimentări" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
+        <ScreenHeader title="Alimentări" subtitle={active ? `${active.brand} ${active.model}` : undefined} back inset={false}
           right={<HeaderIconButton accessibilityLabel="Adaugă alimentare" onPress={() => router.push("/fuel/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
 
         {options.length > 1 && active && (

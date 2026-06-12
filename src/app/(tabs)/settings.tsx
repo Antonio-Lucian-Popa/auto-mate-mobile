@@ -41,7 +41,7 @@ export default function SettingsScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }}>
-        <ScreenHeader title="Setări" />
+        <ScreenHeader title="Setări" inset={false} />
 
         {/* Profil */}
         <AppCard>

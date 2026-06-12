@@ -51,7 +51,7 @@ export default function ScanReceiptScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title="Scanează bon" subtitle="OCR offline pentru bonuri de carburant" back />
+        <ScreenHeader title="Scanează bon" subtitle="OCR offline pentru bonuri de carburant" back inset={false} />
 
         <AppCard className="items-center py-8 mb-6">
           <View className="w-20 h-20 rounded-3xl bg-brand/15 border border-brand/30 items-center justify-center mb-4">

@@ -39,7 +39,7 @@ export default function ReminderDetailScreen() {
   if (!isLoading && !reminder) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Reminder" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Reminder" back inset={false} /></View>
         <EmptyState icon={<Bell size={28} color="#6B7693" />} title="Reminder negăsit" description="Probabil a fost șters." actionLabel="Înapoi" onAction={() => router.back()} />
       </Screen>
     );
@@ -76,7 +76,7 @@ export default function ReminderDetailScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }}>
-        <ScreenHeader title={reminder.title} subtitle={typeLabel} back />
+        <ScreenHeader title={reminder.title} subtitle={typeLabel} back inset={false} />
 
         <AppCard className="items-center py-6 mb-4">
           <View className="w-16 h-16 rounded-3xl items-center justify-center mb-3" style={{ backgroundColor: meta.bg }}>

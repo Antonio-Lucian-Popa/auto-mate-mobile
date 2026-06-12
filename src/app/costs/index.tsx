@@ -56,7 +56,7 @@ export default function CostsHistoryScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title="Costuri" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
+        <ScreenHeader title="Costuri" subtitle={active ? `${active.brand} ${active.model}` : undefined} back inset={false}
           right={<HeaderIconButton accessibilityLabel="Adaugă cost" onPress={() => router.push("/costs/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
 
         {options.length > 1 && active && (

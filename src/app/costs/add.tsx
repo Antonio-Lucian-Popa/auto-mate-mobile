@@ -45,7 +45,7 @@ export default function AddCostScreen() {
   if (!isLoading && options.length === 0) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Cost nou" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Cost nou" back inset={false} /></View>
         <EmptyState icon={<CarFront size={30} color="#FBBF24" />} title="Nicio mașină" description="Adaugă o mașină pentru a înregistra costuri." actionLabel="Adaugă mașină" onAction={() => router.replace("/car/add")} />
       </Screen>
     );
@@ -76,7 +76,7 @@ export default function AddCostScreen() {
     <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <ScreenHeader title="Cost nou" subtitle="Adaugă o cheltuială pentru mașină" back />
+          <ScreenHeader title="Cost nou" subtitle="Adaugă o cheltuială pentru mașină" back inset={false} />
 
           {options.length > 1 && <SegmentedField label="Mașină" options={options} value={carValue ?? ""} onChange={setCarId} />}
           <SegmentedField label="Categorie" options={COST_CATEGORIES.map((c) => ({ value: c.value, label: c.label }))} value={category} onChange={(v) => setCategory(v as CostCategory)} />

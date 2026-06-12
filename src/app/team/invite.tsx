@@ -44,7 +44,7 @@ export default function InviteScreen() {
       const result = await inviteUser.mutateAsync(input);
       Alert.alert(
         "Invitație trimisă",
-        `Utilizatorul ${result.user.email} a fost invitat.\nParolă temporară: ${result.temporaryPassword}`,
+        `Am trimis invitația pe email la ${result.user.email}. Utilizatorul își va activa contul din linkul primit.`,
         [{ text: "OK", onPress: () => router.back() }],
       );
     } catch (e: any) {

@@ -58,7 +58,7 @@ export default function AddCarScreen() {
     <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <ScreenHeader title="Adaugă mașină" back />
+          <ScreenHeader title="Adaugă mașină" back inset={false} />
           <Controller control={control} name="brand" rules={{ required: "Obligatoriu" }} render={({ field: { value, onChange }, fieldState }) => (
             <AppTextInput label="Marcă" placeholder="ex: Volkswagen" value={value} onChangeText={onChange} error={fieldState.error?.message} />
           )} />

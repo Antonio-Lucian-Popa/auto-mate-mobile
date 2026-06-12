@@ -33,6 +33,7 @@ export type CompanyUser = {
   name?: string;
   role: UserRole;
   isActive: boolean;
+  invitationPending?: boolean;
   companyId: string;
 };
 
@@ -204,11 +205,11 @@ export type FleetCar = {
   plateNumber: string;
   make: string;
   model: string;
-  year: number;
-  mileage: number;
+  year: number | null;
+  mileage: number | null;
   assignedUser?: Pick<CompanyUser, "id" | "email" | "firstName" | "lastName">;
-  documents: FleetDocument[];
-  totalCosts12m: number;
+  documents?: FleetDocument[] | null;
+  totalCosts12m?: number | null;
 };
 
 export type StatsSummary = {

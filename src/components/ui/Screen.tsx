@@ -12,13 +12,14 @@ type Props = PropsWithChildren<{
 }>;
 
 const DEFAULT_EDGES: Edge[] = ["top", "left", "right"];
+const ANDROID_TOP_GUTTER = 8;
 
 export function Screen({ children, className, style, edges = DEFAULT_EDGES }: Props) {
   return (
     <SafeAreaView
       edges={edges}
       className={cn("flex-1 bg-bg", className)}
-      style={[{ flex: 1, backgroundColor: colors.bg }, style]}
+      style={[{ flex: 1, backgroundColor: colors.bg, paddingTop: ANDROID_TOP_GUTTER }, style]}
     >
       {children}
     </SafeAreaView>

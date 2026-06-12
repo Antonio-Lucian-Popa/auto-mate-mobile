@@ -42,7 +42,7 @@ export default function AddDocumentScreen() {
   if (!isLoading && options.length === 0) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Document nou" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Document nou" back inset={false} /></View>
         <EmptyState icon={<CarFront size={30} color="#22D3EE" />} title="Nicio mașină" description="Adaugă o mașină pentru a atașa documente." actionLabel="Adaugă mașină" onAction={() => router.replace("/car/add")} />
       </Screen>
     );
@@ -71,7 +71,7 @@ export default function AddDocumentScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-        <ScreenHeader title="Document nou" subtitle="Atașează RCA, ITP, factură sau bon" back />
+        <ScreenHeader title="Document nou" subtitle="Atașează RCA, ITP, factură sau bon" back inset={false} />
 
         <Pressable
           onPress={pickFile}

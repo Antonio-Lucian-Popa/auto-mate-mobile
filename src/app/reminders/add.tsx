@@ -67,7 +67,7 @@ export default function AddReminderScreen() {
   if (!isLoading && options.length === 0) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Reminder nou" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Reminder nou" back inset={false} /></View>
         <EmptyState
           icon={<CarFront size={30} color="#5B8DEF" />}
           title="Nicio mașină"
@@ -83,7 +83,7 @@ export default function AddReminderScreen() {
     <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <ScreenHeader title="Reminder nou" subtitle="RCA, ITP, rovinietă, service și altele" back />
+          <ScreenHeader title="Reminder nou" subtitle="RCA, ITP, rovinietă, service și altele" back inset={false} />
 
           {options.length > 1 && (
             <SegmentedField label="Mașină" options={options} value={carValue ?? ""} onChange={setCarId} />

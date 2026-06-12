@@ -81,7 +81,7 @@ export default function DocumentsScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title="Documente" subtitle={active ? `${active.brand} ${active.model}` : undefined} back
+        <ScreenHeader title="Documente" subtitle={active ? `${active.brand} ${active.model}` : undefined} back inset={false}
           right={<HeaderIconButton accessibilityLabel="Adaugă document" onPress={() => router.push("/documents/add")} icon={<Plus size={20} color="#7FA8FF" />} />} />
 
         {loading ? (

@@ -75,7 +75,7 @@ export default function AddFuelScreen() {
   if (!isLoading && options.length === 0) {
     return (
       <Screen className="flex-1 bg-bg">
-        <View className="px-5 pt-2"><ScreenHeader title="Alimentare nouă" back /></View>
+        <View className="px-5 pt-2"><ScreenHeader title="Alimentare nouă" back inset={false} /></View>
         <EmptyState icon={<CarFront size={30} color="#34D399" />} title="Nicio mașină" description="Adaugă o mașină pentru a înregistra alimentări." actionLabel="Adaugă mașină" onAction={() => router.replace("/car/add")} />
       </Screen>
     );
@@ -117,7 +117,7 @@ export default function AddFuelScreen() {
     <Screen className="flex-1 bg-bg">
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ padding: 20, gap: 16, paddingBottom: 40 }} keyboardShouldPersistTaps="handled">
-          <ScreenHeader title="Alimentare nouă" subtitle="Înregistrează o plină de carburant" back
+          <ScreenHeader title="Alimentare nouă" subtitle="Înregistrează o plină de carburant" back inset={false}
             right={<Pressable onPress={() => router.push("/receipts/scan")} className="flex-row items-center gap-1.5 bg-brand/15 border border-brand/30 px-3 h-9 rounded-xl active:opacity-70">
               <ScanLine size={16} color="#5B8DEF" /><Text className="text-brand-glow text-sm font-medium">Scan</Text>
             </Pressable>} />

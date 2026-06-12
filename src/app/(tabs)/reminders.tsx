@@ -37,7 +37,7 @@ export default function RemindersScreen() {
   return (
     <Screen className="flex-1 bg-bg">
       <View className="flex-1 px-5 pt-2">
-        <ScreenHeader title="Reminder-e" subtitle="RCA, ITP, rovinietă, service" />
+        <ScreenHeader title="Reminder-e" subtitle="RCA, ITP, rovinietă, service" inset={false} />
         {isLoading ? (
           <SkeletonList count={4} />
         ) : !sections.length ? (

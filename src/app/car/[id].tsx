@@ -56,6 +56,7 @@ export default function CarDetailScreen() {
           title={`${car.brand} ${car.model}`}
           subtitle={car.licensePlate}
           back
+          inset={false}
           right={
             canManageFleet() ? (
               <Pressable onPress={onDelete} className="w-10 h-10 rounded-xl bg-danger/10 border border-danger/30 items-center justify-center active:opacity-70">

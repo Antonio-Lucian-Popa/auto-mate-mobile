@@ -15,3 +15,11 @@ export function useInviteUser() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
   });
 }
+
+export function useRemoveUser() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => usersApi.remove(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["users"] }),
+  });
+}

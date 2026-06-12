@@ -6,6 +6,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { useFleetOverview } from "@/hooks/useFleet";
 import { formatRONValue } from "@/lib/format";
+import type { FleetCar, FleetDocument } from "@/types";
 import { Car, AlertTriangle } from "lucide-react-native";
 
 const DOC_STATUS_COLOR: Record<string, string> = {
@@ -36,11 +37,13 @@ export default function FleetScreen() {
             description="Adaugă mașini din tab-ul Garaj."
           />
         ) : (
-          fleet.map((car) => (
+          fleet.map((car: FleetCar) => (
             <AppCard key={car.id}>
               <View className="flex-row items-start justify-between mb-2">
                 <View>
-                  <Text className="text-ink font-bold text-base">{car.make} {car.model} ({car.year})</Text>
+                  <Text className="text-ink font-bold text-base">
+                    {car.make} {car.model}{car.year ? ` (${car.year})` : ""}
+                  </Text>
                   <Text className="text-ink-soft text-sm">{car.plateNumber}</Text>
                   {car.assignedUser && (
                     <Text className="text-ink-soft text-sm mt-0.5">
@@ -49,14 +52,16 @@ export default function FleetScreen() {
                   )}
                 </View>
                 <View className="items-end">
-                  <Text className="text-ink-soft text-xs">{car.mileage.toLocaleString("ro-RO")} km</Text>
-                  <Text className="text-brand-glow text-sm font-semibold mt-1">{formatRONValue(car.totalCosts12m)} RON/an</Text>
+                  <Text className="text-ink-soft text-xs">
+                    {typeof car.mileage === "number" ? `${car.mileage.toLocaleString("ro-RO")} km` : "-- km"}
+                  </Text>
+                  <Text className="text-brand-glow text-sm font-semibold mt-1">{formatRONValue(car.totalCosts12m ?? 0)} RON/an</Text>
                 </View>
               </View>
 
-              {car.documents.length > 0 && (
+              {(car.documents?.length ?? 0) > 0 && (
                 <View className="gap-1 pt-2 border-t border-line">
-                  {car.documents.map((doc, i) => (
+                  {car.documents?.map((doc: FleetDocument, i: number) => (
                     <View key={i} className="flex-row items-center justify-between">
                       <View className="flex-row items-center gap-2">
                         {doc.status !== "valid" && <AlertTriangle size={13} color={DOC_STATUS_COLOR[doc.status]} />}
