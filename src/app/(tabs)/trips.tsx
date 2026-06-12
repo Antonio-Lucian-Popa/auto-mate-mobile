@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity } from "react-native";
 import { router } from "expo-router";
 import { Screen } from "@/components/ui/Screen";
@@ -7,13 +8,28 @@ import { FloatingActionButton } from "@/components/ui/FloatingActionButton";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { useTrips } from "@/hooks/useTrips";
+import { useRole } from "@/hooks/useRole";
 import { TRIP_STATUS_META } from "@/constants";
 import { formatDate } from "@/lib/date";
 import { formatRONValue } from "@/lib/format";
 import { MapPin, Plus } from "lucide-react-native";
+import type { TripStatus } from "@/types";
+
+const STATUS_FILTERS: { value: TripStatus | "ALL"; label: string }[] = [
+  { value: "ALL", label: "Toate" },
+  { value: "ACTIVE", label: "Active" },
+  { value: "SUBMITTED", label: "Trimise" },
+  { value: "APPROVED", label: "Aprobate" },
+  { value: "REJECTED", label: "Respinse" },
+];
 
 export default function TripsScreen() {
-  const { data: trips, isLoading, refetch, isRefetching } = useTrips();
+  const [statusFilter, setStatusFilter] = useState<TripStatus | "ALL">("ALL");
+  const { canApprove } = useRole();
+
+  const { data: trips, isLoading, refetch, isRefetching } = useTrips(
+    statusFilter !== "ALL" ? { status: statusFilter } : undefined
+  );
 
   return (
     <Screen className="flex-1 bg-bg">
@@ -21,9 +37,25 @@ export default function TripsScreen() {
         contentContainerStyle={{ padding: 20, gap: 12, paddingBottom: 100 }}
         refreshControl={<RefreshControl refreshing={isRefetching} onRefresh={refetch} tintColor="#5B8DEF" />}
       >
-        <View className="mb-2">
+        <View className="mb-1">
           <Text className="text-ink text-2xl font-bold">Delegații</Text>
         </View>
+
+        {/* Filtre status */}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}>
+          {STATUS_FILTERS.map((f) => {
+            const active = statusFilter === f.value;
+            return (
+              <TouchableOpacity
+                key={f.value}
+                onPress={() => setStatusFilter(f.value)}
+                className={`px-4 py-2 rounded-full border ${active ? "bg-brand border-brand" : "border-line bg-bg-card"}`}
+              >
+                <Text className={`text-sm font-medium ${active ? "text-white" : "text-ink-soft"}`}>{f.label}</Text>
+              </TouchableOpacity>
+            );
+          })}
+        </ScrollView>
 
         {isLoading ? (
           <SkeletonList count={4} />
@@ -31,9 +63,9 @@ export default function TripsScreen() {
           <EmptyState
             icon={<MapPin size={32} color="#7FA8FF" />}
             title="Nicio delegație"
-            description="Creează prima delegație pentru a înregistra cheltuieli."
-            actionLabel="Delegație nouă"
-            onAction={() => router.push("/trips/add")}
+            description={statusFilter === "ALL" ? "Creează prima delegație pentru a înregistra cheltuieli." : "Nicio delegație cu statusul selectat."}
+            actionLabel={statusFilter === "ALL" ? "Delegație nouă" : undefined}
+            onAction={statusFilter === "ALL" ? () => router.push("/trips/add") : undefined}
           />
         ) : (
           trips.map((trip) => {
@@ -46,17 +78,22 @@ export default function TripsScreen() {
                     <Badge label={meta.label} color={meta.color} />
                   </View>
                   {trip.purpose && <Text className="text-ink-soft text-sm mb-1">{trip.purpose}</Text>}
-                  <Text className="text-ink-soft text-xs">{formatDate(trip.startDate)}{trip.endDate ? ` → ${formatDate(trip.endDate)}` : ""}</Text>
-                  {trip.totalExpenses != null && (
-                    <View className="flex-row justify-between mt-2 pt-2 border-t border-line">
-                      <Text className="text-ink-soft text-sm">Total cheltuieli</Text>
-                      <Text className="text-ink font-medium">{formatRONValue(trip.totalExpenses)} RON</Text>
-                    </View>
+                  <Text className="text-ink-soft text-xs">
+                    {formatDate(trip.startDate)}{trip.endDate ? ` → ${formatDate(trip.endDate)}` : ""}
+                  </Text>
+                  {trip.user && (
+                    <Text className="text-ink-soft text-xs mt-0.5">
+                      {[trip.user.firstName, trip.user.lastName].filter(Boolean).join(" ") || trip.user.email}
+                    </Text>
                   )}
-                  {trip.budget != null && (
-                    <View className="flex-row justify-between mt-1">
-                      <Text className="text-ink-soft text-sm">Buget</Text>
-                      <Text className="text-ink-soft text-sm">{formatRONValue(trip.budget)} RON</Text>
+                  {(trip.totalExpenses != null || trip.budget != null) && (
+                    <View className="flex-row justify-between mt-2 pt-2 border-t border-line">
+                      {trip.totalExpenses != null && (
+                        <Text className="text-ink text-sm font-medium">{formatRONValue(trip.totalExpenses)} RON cheltuieli</Text>
+                      )}
+                      {trip.budget != null && (
+                        <Text className="text-ink-soft text-sm">buget: {formatRONValue(trip.budget)}</Text>
+                      )}
                     </View>
                   )}
                 </AppCard>

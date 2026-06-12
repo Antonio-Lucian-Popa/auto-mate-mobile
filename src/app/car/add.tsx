@@ -8,7 +8,9 @@ import { AppTextInput } from "@/components/ui/AppTextInput";
 import { AppButton } from "@/components/ui/AppButton";
 import { SegmentedField } from "@/components/forms/SegmentedField";
 import { useCreateCar } from "@/hooks/useCars";
+import { useCompanyUsers } from "@/hooks/useUsers";
 import { useCarStore } from "@/stores/carStore";
+import { useRole } from "@/hooks/useRole";
 import { FUEL_TYPES } from "@/constants";
 import type { FuelType } from "@/types";
 
@@ -17,8 +19,19 @@ type Form = { brand: string; model: string; year: string; licensePlate: string; 
 export default function AddCarScreen() {
   const { control, handleSubmit } = useForm<Form>({ defaultValues: { brand: "", model: "", year: "", licensePlate: "", vin: "", currentMileage: "" } });
   const [fuelType, setFuelType] = useState<FuelType>("motorina");
+  const [assignedUserId, setAssignedUserId] = useState<string>("");
   const create = useCreateCar();
   const setSelected = useCarStore((s) => s.setSelectedCar);
+  const { canManageFleet } = useRole();
+  const { data: users } = useCompanyUsers();
+
+  const userOptions = [
+    { value: "", label: "Neasignat" },
+    ...(users ?? []).map((u) => ({
+      value: u.id,
+      label: [u.firstName, u.lastName].filter(Boolean).join(" ") || u.email,
+    })),
+  ];
 
   const onSubmit = (d: Form) => {
     create.mutate(
@@ -30,6 +43,7 @@ export default function AddCarScreen() {
         vin: d.vin.trim() || undefined,
         fuelType,
         currentMileage: Number(d.currentMileage) || 0,
+        assignedUserId: assignedUserId || undefined,
       },
       {
         onSuccess: (car) => {
@@ -70,6 +84,9 @@ export default function AddCarScreen() {
             <AppTextInput label="VIN (opțional)" placeholder="WVWZZZ..." autoCapitalize="characters" value={value} onChangeText={onChange} />
           )} />
           <SegmentedField label="Combustibil" options={FUEL_TYPES} value={fuelType} onChange={(v) => setFuelType(v as FuelType)} />
+          {canManageFleet() && userOptions.length > 1 && (
+            <SegmentedField label="Asignat utilizatorului" options={userOptions} value={assignedUserId} onChange={setAssignedUserId} />
+          )}
           <AppButton title="Salvează mașina" onPress={handleSubmit(onSubmit)} loading={create.isPending} className="mt-2" />
         </ScrollView>
       </KeyboardAvoidingView>

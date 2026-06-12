@@ -9,11 +9,12 @@ import { Badge } from "@/components/ui/Badge";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { SkeletonList } from "@/components/ui/Skeleton";
 import { useTrip, useCloseTrip, useSubmitTrip, useApproveTrip, useRejectTrip } from "@/hooks/useTrips";
+import { useGenerateTripReport } from "@/hooks/useReports";
 import { useRole } from "@/hooks/useRole";
 import { formatRONValue } from "@/lib/format";
 import { formatDate } from "@/lib/date";
 import { TRIP_STATUS_META } from "@/constants";
-import { Plus, Receipt } from "lucide-react-native";
+import { Plus, Receipt, FileText } from "lucide-react-native";
 import { colors } from "@/constants/theme";
 
 type ModalState = { type: "close" | "reject" | null; value: string };
@@ -21,8 +22,9 @@ type ModalState = { type: "close" | "reject" | null; value: string };
 export default function TripDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { data: trip, isLoading } = useTrip(id);
-  const { canApprove } = useRole();
+  const { canApprove, canViewFleet } = useRole();
   const closeTrip = useCloseTrip();
+  const generateReport = useGenerateTripReport();
   const submitTrip = useSubmitTrip();
   const approveTrip = useApproveTrip();
   const rejectTrip = useRejectTrip();
@@ -156,7 +158,7 @@ export default function TripDetailScreen() {
           {trip.expenses?.length ? (
             <View className="gap-2">
               {trip.expenses.map((exp) => (
-                <AppCard key={exp.id}>
+                <AppCard key={exp.id} onPress={() => router.push(`/expenses/${exp.id}`)}>
                   <View className="flex-row items-center justify-between">
                     <View>
                       <Text className="text-ink font-medium">{exp.category}</Text>
@@ -203,6 +205,20 @@ export default function TripDetailScreen() {
                 variant="danger"
               />
             </View>
+          )}
+          {canViewFleet() && (
+            <AppButton
+              title="Generează raport PDF"
+              variant="secondary"
+              icon={<FileText size={16} color="#6B7693" />}
+              onPress={() =>
+                generateReport.mutate(trip.id, {
+                  onSuccess: () => Alert.alert("Raport generat", "Raportul este disponibil în secțiunea Rapoarte."),
+                  onError: (e: any) => Alert.alert("Eroare", e.message),
+                })
+              }
+              loading={generateReport.isPending}
+            />
           )}
         </View>
       </ScrollView>
