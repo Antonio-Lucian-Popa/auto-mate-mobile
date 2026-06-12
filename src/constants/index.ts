@@ -1,4 +1,4 @@
-import type { ReminderType, CostCategory, DocumentType, FuelType } from "@/types";
+import type { ReminderType, CostCategory, DocumentType, FuelType, ExpenseCategory, UserRole } from "@/types";
 
 export const REMINDER_TYPES: { value: ReminderType; label: string; icon: string }[] = [
   { value: "RCA", label: "RCA", icon: "ShieldCheck" },
@@ -48,3 +48,28 @@ export const FUEL_TYPES: { value: FuelType; label: string }[] = [
 ];
 
 export const FUEL_STATIONS = ["OMV", "Petrom", "MOL", "Rompetrol", "Lukoil", "Socar", "Gazprom", "Shell", "Altă stație"];
+
+export const EXPENSE_CATEGORIES: { value: ExpenseCategory; label: string; icon: string; color: string }[] = [
+  { value: "COMBUSTIBIL", label: "Combustibil", icon: "Fuel", color: "#5B8DEF" },
+  { value: "MASA", label: "Masă", icon: "Utensils", color: "#FBBF24" },
+  { value: "CAZARE", label: "Cazare", icon: "BedDouble", color: "#34D399" },
+  { value: "TRANSPORT", label: "Transport", icon: "Train", color: "#A78BFA" },
+  { value: "DIURNA", label: "Diurnă", icon: "Banknote", color: "#22D3EE" },
+  { value: "ALTELE", label: "Altele", icon: "MoreHorizontal", color: "#6B7693" },
+];
+
+export const TRIP_STATUS_META: Record<string, { label: string; color: string }> = {
+  DRAFT:     { label: "Ciornă",    color: "#6B7693" },
+  ACTIVE:    { label: "Activă",    color: "#34D399" },
+  CLOSED:    { label: "Închisă",   color: "#FBBF24" },
+  SUBMITTED: { label: "Trimisă",   color: "#5B8DEF" },
+  APPROVED:  { label: "Aprobată",  color: "#22D3EE" },
+  REJECTED:  { label: "Respinsă",  color: "#F87171" },
+};
+
+export const USER_ROLE_META: Record<UserRole, { label: string; color: string }> = {
+  ADMIN:       { label: "Admin",      color: "#F87171" },
+  MANAGER:     { label: "Manager",    color: "#5B8DEF" },
+  ACCOUNTANT:  { label: "Contabil",   color: "#34D399" },
+  EMPLOYEE:    { label: "Angajat",    color: "#A78BFA" },
+};

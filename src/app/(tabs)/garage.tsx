@@ -5,6 +5,7 @@ import { Car as CarIcon, Plus } from "lucide-react-native";
 import { useCars } from "@/hooks/useCars";
 import { useReminders } from "@/hooks/useReminders";
 import { useCarStore } from "@/stores/carStore";
+import { useRole } from "@/hooks/useRole";
 import { CarCard } from "@/components/cards/CarCard";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -16,6 +17,7 @@ export default function GarageScreen() {
   const { data: cars, isLoading } = useCars();
   const { data: reminders } = useReminders();
   const { selectedCarId, setSelectedCar } = useCarStore();
+  const { canManageFleet } = useRole();
 
   return (
     <Screen className="flex-1 bg-bg">
@@ -28,8 +30,8 @@ export default function GarageScreen() {
             icon={<CarIcon size={32} color="#7FA8FF" />}
             title="Garaj gol"
             description="Adaugă prima mașină pentru a urmări costuri, documente și remindere."
-            actionLabel="Adaugă mașină"
-            onAction={() => router.push("/car/add")}
+            actionLabel={canManageFleet() ? "Adaugă mașină" : undefined}
+            onAction={canManageFleet() ? () => router.push("/car/add") : undefined}
           />
         ) : (
           <FlatList
@@ -53,7 +55,9 @@ export default function GarageScreen() {
           />
         )}
       </View>
-      <FloatingActionButton onPress={() => router.push("/car/add")} icon={<Plus size={28} color="#fff" />} />
+      {canManageFleet() && (
+        <FloatingActionButton onPress={() => router.push("/car/add")} icon={<Plus size={28} color="#fff" />} />
+      )}
     </Screen>
   );
 }

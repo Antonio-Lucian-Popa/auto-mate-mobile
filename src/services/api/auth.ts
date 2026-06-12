@@ -1,5 +1,5 @@
 import { apiRequest } from "./client";
-import type { AuthTokens, User } from "@/types";
+import type { AuthTokens, User, Company } from "@/types";
 
 type BackendUser = {
   id: string;
@@ -7,9 +7,16 @@ type BackendUser = {
   firstName?: string | null;
   lastName?: string | null;
   name?: string | null;
+  companyId?: string;
+  role?: User["role"];
+  isActive?: boolean;
 };
 
-type BackendAuthResponse = AuthTokens & { user?: BackendUser };
+type BackendAuthResponse = AuthTokens & {
+  user?: BackendUser;
+  company?: Company;
+};
+
 type AuthResponse = AuthTokens & { user?: User };
 
 function mapUser(user?: BackendUser | null): User | undefined {
@@ -19,6 +26,9 @@ function mapUser(user?: BackendUser | null): User | undefined {
     id: user.id,
     email: user.email,
     name: user.name ?? (fullName || undefined),
+    companyId: user.companyId,
+    role: user.role,
+    isActive: user.isActive,
   };
 }
 
@@ -30,8 +40,12 @@ export const authApi = {
   login: (email: string, password: string) =>
     apiRequest<BackendAuthResponse>("/auth/login", { method: "POST", body: { email, password }, auth: false }).then(mapAuthResponse),
 
-  register: (email: string, password: string, name?: string) =>
-    apiRequest<BackendAuthResponse>("/auth/register", { method: "POST", body: { email, password, firstName: name }, auth: false }).then(mapAuthResponse),
+  register: (email: string, password: string, firstName?: string, companyName?: string) =>
+    apiRequest<BackendAuthResponse>("/auth/register", {
+      method: "POST",
+      body: { email, password, firstName, companyName },
+      auth: false,
+    }).then(mapAuthResponse),
 
   me: () =>
     apiRequest<BackendUser>("/users/me").then(mapUser),

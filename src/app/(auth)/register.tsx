@@ -2,17 +2,17 @@ import { useState } from "react";
 import { View, Text, KeyboardAvoidingView, Platform, ScrollView } from "react-native";
 import { Screen } from "@/components/ui/Screen";
 import { Link } from "expo-router";
-import { Mail, Lock, User } from "lucide-react-native";
+import { Mail, Lock, User, Building2 } from "lucide-react-native";
 import { useForm, Controller } from "react-hook-form";
 import { AppButton } from "@/components/ui/AppButton";
 import { AppTextInput } from "@/components/ui/AppTextInput";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { useAuthStore } from "@/stores/authStore";
 
-type Form = { name: string; email: string; password: string };
+type Form = { name: string; companyName: string; email: string; password: string };
 
 export default function RegisterScreen() {
-  const { control, handleSubmit } = useForm<Form>({ defaultValues: { name: "", email: "", password: "" } });
+  const { control, handleSubmit } = useForm<Form>({ defaultValues: { name: "", companyName: "", email: "", password: "" } });
   const register = useAuthStore((s) => s.register);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export default function RegisterScreen() {
     setLoading(true);
     setErr(null);
     try {
-      await register(d.email.trim(), d.password, d.name.trim() || undefined);
+      await register(d.email.trim(), d.password, d.name.trim() || undefined, d.companyName.trim());
     } catch (e: any) {
       setErr(e.message ?? "Înregistrare eșuată.");
     } finally {
@@ -34,8 +34,11 @@ export default function RegisterScreen() {
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : undefined} className="flex-1">
         <ScrollView contentContainerStyle={{ flexGrow: 1, padding: 24, justifyContent: "center" }} keyboardShouldPersistTaps="handled">
           <Text className="text-ink text-3xl font-bold mb-1">Creează cont</Text>
-          <Text className="text-ink-soft mb-8">Începe să-ți gestionezi mașinile</Text>
+          <Text className="text-ink-soft mb-8">Începe să-ți gestionezi flota</Text>
           <View className="gap-4">
+            <Controller control={control} name="companyName" rules={{ required: "Introdu numele companiei" }} render={({ field: { value, onChange }, fieldState }) => (
+              <AppTextInput label="Companie *" placeholder="Numele firmei" value={value} onChangeText={onChange} error={fieldState.error?.message} icon={<Building2 size={18} color="#6B7693" />} />
+            )} />
             <Controller control={control} name="name" render={({ field: { value, onChange } }) => (
               <AppTextInput label="Nume" placeholder="Numele tău" value={value} onChangeText={onChange} icon={<User size={18} color="#6B7693" />} />
             )} />

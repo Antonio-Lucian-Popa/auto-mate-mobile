@@ -5,6 +5,7 @@ import { useLocalSearchParams, router } from "expo-router";
 import { Trash2, Fuel, Wallet, FileText, BellPlus, Gauge } from "lucide-react-native";
 import { useCar, useDeleteCar } from "@/hooks/useCars";
 import { useCarReminders } from "@/hooks/useReminders";
+import { useRole } from "@/hooks/useRole";
 import { ScreenHeader } from "@/components/ui/ScreenHeader";
 import { AppCard } from "@/components/ui/AppCard";
 import { StatCard } from "@/components/ui/StatCard";
@@ -22,6 +23,7 @@ export default function CarDetailScreen() {
   const { data: car, isLoading } = useCar(id);
   const { data: reminders } = useCarReminders(id);
   const del = useDeleteCar();
+  const { canManageFleet } = useRole();
   const [monthlyCost, setMonthlyCost] = useState(0);
 
   useEffect(() => {
@@ -55,9 +57,11 @@ export default function CarDetailScreen() {
           subtitle={car.licensePlate}
           back
           right={
-            <Pressable onPress={onDelete} className="w-10 h-10 rounded-xl bg-danger/10 border border-danger/30 items-center justify-center active:opacity-70">
-              <Trash2 size={18} color="#F87171" />
-            </Pressable>
+            canManageFleet() ? (
+              <Pressable onPress={onDelete} className="w-10 h-10 rounded-xl bg-danger/10 border border-danger/30 items-center justify-center active:opacity-70">
+                <Trash2 size={18} color="#F87171" />
+              </Pressable>
+            ) : undefined
           }
         />
 

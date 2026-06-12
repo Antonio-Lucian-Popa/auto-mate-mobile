@@ -10,7 +10,7 @@ type AuthState = {
   error: string | null;
   bootstrap: () => Promise<void>;
   login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
+  register: (email: string, password: string, name?: string, companyName?: string) => Promise<void>;
   continueAsGuest: () => void;
   logout: () => Promise<void>;
   clearError: () => void;
@@ -32,7 +32,6 @@ export const useAuthStore = create<AuthState>((set, get) => ({
       const user = await authApi.me();
       set({ user: user ?? null, status: "authenticated" });
     } catch {
-      // Tokenul poate fi refresh-uit automat de client; dacă profilul nu vine, păstrăm sesiunea.
       set({ status: "authenticated" });
     }
   },
@@ -49,10 +48,10 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
   },
 
-  register: async (email, password, name) => {
+  register: async (email, password, name, companyName) => {
     set({ status: "loading", error: null });
     try {
-      const res = await authApi.register(email, password, name);
+      const res = await authApi.register(email, password, name, companyName);
       await tokenStorage.save(res.accessToken, res.refreshToken);
       set({ user: res.user ?? { id: "me", email, name }, status: "authenticated" });
     } catch (e: any) {
