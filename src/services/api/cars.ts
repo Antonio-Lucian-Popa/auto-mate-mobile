@@ -8,6 +8,7 @@ type BackendCar = Omit<Car, "brand" | "licensePlate"> & {
   brand?: string;
   plateNumber?: string;
   licensePlate?: string;
+  assignedUserId?: string;
 };
 
 type BackendCarInput = Omit<CarInput, "brand" | "licensePlate"> & {
@@ -22,11 +23,7 @@ type BackendCarUpdateInput = Partial<Omit<CarInput, "brand" | "licensePlate">> &
 
 function toBackendCarInput(data: CarInput): BackendCarInput {
   const { brand, licensePlate, ...rest } = data;
-  return {
-    ...rest,
-    make: brand,
-    plateNumber: licensePlate,
-  };
+  return { ...rest, make: brand, plateNumber: licensePlate };
 }
 
 function toBackendCarUpdateInput(data: Partial<CarInput>): BackendCarUpdateInput {
@@ -43,6 +40,7 @@ function toCar(data: BackendCar): Car {
     ...data,
     brand: data.brand ?? data.make ?? "",
     licensePlate: data.licensePlate ?? data.plateNumber ?? "",
+    assignedUserId: data.assignedUserId,
   };
 }
 
